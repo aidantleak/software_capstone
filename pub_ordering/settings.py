@@ -31,7 +31,13 @@ SECRET_KEY = 'django-insecure-*jn(eujcxe7n#)u!ks5-z^1pksb^r#5&ezi486ubnw95&ma2@l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://triton-pub-ordering-and-delivery.onrender.com', '127.0.0.1']
+
+ALLOWED_HOSTS = [
+    'triton-pub-ordering-and-delivery.onrender.com',  # Render domain
+    '127.0.0.1',  # Local development
+    'localhost',
+]
+
 
 
 # Application definition
