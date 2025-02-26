@@ -24,7 +24,7 @@ urlpatterns = [
     path('', include('orders.urls')), 
    #path('', include('googleauthentication.urls')),
     path("accounts/", include('allauth.urls')),
-    path("/", include('pub_ordering.urls')),
+    path("/", include('users.urls')),
 ]
 
 if settings.DEBUG:
