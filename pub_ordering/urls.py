@@ -22,6 +22,9 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('orders.urls')), 
+    path('', include('googleauthentication.urls')),
+    path("accounts/", include('allauth.urls')),
+    path("/", include('users.urls')),
 ]
 
 if settings.DEBUG:
