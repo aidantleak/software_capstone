@@ -10,11 +10,11 @@ class Meal(models.Model):
     def __str__(self):
         return self.name
         
-  class Side(models.Model):
-    meal = models.ForeignKey(Meal, related_name='sides', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+  #class Side(models.Model):
+   # meal = models.ForeignKey(Meal, related_name='sides', on_delete=models.CASCADE)
+    #name = models.CharField(max_length=100)
+    #price = models.DecimalField(max_digits=6, decimal_places=2)
     
-    def __str__(self):
-        return f"{self.name} - {self.price}"  
+    #def __str__(self):
+     #   return f"{self.name} - {self.price}"  
     
