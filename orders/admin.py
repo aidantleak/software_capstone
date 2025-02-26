@@ -14,11 +14,11 @@ class MealAdmin(admin.ModelAdmin):
     image_preview.allow_tags = True
     image_preview.short_description = 'Image'
     
-class Side(models.Model):
-    meal = models.ForeignKey(Meal, related_name='sides', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    image = models.ImageField(upload_to='side_images/', null=True, blank=True)  # Optional image field
+#class Side(models.Model):
+ #   meal = models.ForeignKey(Meal, related_name='sides', on_delete=models.CASCADE)
+ #  name = models.CharField(max_length=100)
+  #  price = models.DecimalField(max_digits=6, decimal_places=2)
+   # image = models.ImageField(upload_to='side_images/', null=True, blank=True)  # Optional image field
     
     
     
