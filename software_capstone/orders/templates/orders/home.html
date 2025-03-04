@@ -1,0 +1,84 @@
+/* home.html */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Triton Pub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .banner {
+            background-color: navy;
+            color: white;
+            padding: 20px;
+        }
+        .banner h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .banner .triton {
+            color: gold;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #005f5f;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1><span class="triton">Triton</span> Pub</h1>
+        <h2>Eckerd College</h2>
+    </div>
+    
+    <div class="container">
+        <div class="section welcome">
+            <h3>Welcome to Triton Pub!</h3>
+            <p>Triton Pub is the perfect place to grab a quick and delicious meal while enjoying a friendly and inviting atmosphere. Whether you're hanging out with friends, catching up on schoolwork, or just looking for a cozy spot to relax, the pub has something for everyone. With frequent events like school concerts and movie nights, it's more than just a dining spot—it's a community hub. Stop by for an easy and satisfying meal, and experience the great vibes at Triton Pub!</p>
+        </div>
+        
+        <div class="section hours">
+            <h3>Business Hours</h3>
+            <p><strong>Retail:</strong> Monday - Sunday, 11:00 AM - 10:00 PM</p>
+            <p><strong>Lunch Meal Swipe:</strong> 11:00 AM - 2:00 PM</p>
+            <p><strong>Dinner Meal Swipe:</strong> 7:00 PM - 10:00 PM</p>
+        </div>
+    </div>
+    
+    <a href="menu.html" class="button">View Menu</a>
+    <a href="order.html" class="button">Place an Order</a>
+</body>
+</html>
