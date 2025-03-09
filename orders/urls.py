@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import menu  # Ensure views are correctly imported
+from .views import *  
 
 urlpatterns = [
     path('menu/', menu, name ='menu'),
+    path('home/', home, name ='home'),
 ]
