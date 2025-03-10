@@ -69,19 +69,14 @@
     
     <div class="container">
         <div class="form-container">
-            <form action="submit_order.html" method="post">
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
-                
-                <label for="meal">Select Your Meal:</label>
-                <select id="meal" name="meal">
-                    <option value="burger">Burger</option>
-                    <option value="pizza">Pizza</option>
-                    <option value="salad">Salad</option>
-                </select>
+            <form action="{% url 'order' %}" method="POST">
+                {% csrf_token %}
 
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" min="1" required>
+                <label for="{{ form.meal.id_for_label }}">Select Your Meal:</label>
+                {{ form.meal }}
+
+                <label for="{{ form.quantity.id_for_label }}">Quantity:</label>
+                {{ form.quantity }}
 
                 <button type="submit" class="button">Place Order</button>
             </form>
