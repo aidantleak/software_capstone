@@ -58,7 +58,8 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        .menu-item select {
+        .menu-item select,
+        .menu-item input[type="number"] {
             margin-top: 10px;
             padding: 8px;
             width: 90%;
@@ -67,8 +68,19 @@
             font-family: "Segoe UI", sans-serif;
             box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
         }
-        .menu-item p {
-            margin: 5px 0;
+        .menu-item form button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .menu-item form button:hover {
+            background-color: #007777;
         }
         .button {
             display: inline-block;
@@ -104,28 +116,37 @@
 
     <div class="menu-container">
         {% for meal in meals %}
-        <div class="menu-item">
-            {% if meal.image %}
-                <img src="{{ meal.image.url }}" alt="{{ meal.name }}">
-            {% else %}
-                <p>No Image Available</p>
-            {% endif %}
-            <h3>{{ meal.name }}</h3>
-            <p class="price">${{ meal.price }}</p>
-            <p>Category: {{ meal.category }}</p>
-            <p>Meal Swipe Eligible: {% if meal.mealSwipe %}✅{% else %}-{% endif %}</p>
-            <label for="side">Choose a side:</label><br>
-            <select name="side">
-                <option value="fries">Fries</option>
-                <option value="Sweet Potato Fries">Sweet Potato Fries</option>
-                <option value="chips">Chips</option>
-                <option value="fruit">Fruit</option>
-            </select>
-        </div>
+        <form action="{% url 'add_to_cart' meal.id %}" method="POST">
+            {% csrf_token %}
+            <div class="menu-item">
+                {% if meal.image %}
+                    <img src="{{ meal.image.url }}" alt="{{ meal.name }}">
+                {% else %}
+                    <p>No Image Available</p>
+                {% endif %}
+                <h3>{{ meal.name }}</h3>
+                <p class="price">${{ meal.price }}</p>
+                <p>Category: {{ meal.category }}</p>
+                <p>Meal Swipe Eligible: {% if meal.mealSwipe %}✅{% else %}-{% endif %}</p>
+
+                <label for="side">Choose a side:</label><br>
+                <select name="side" required>
+                    <option value="fries">Fries</option>
+                    <option value="Sweet Potato Fries">Sweet Potato Fries</option>
+                    <option value="chips">Chips</option>
+                    <option value="fruit">Fruit</option>
+                </select>
+
+                <label for="quantity">Quantity:</label><br>
+                <input type="number" name="quantity" value="1" min="1" required>
+
+                <button type="submit">Add to Cart</button>
+            </div>
+        </form>
         {% endfor %}
     </div>
 
     <a href="{% url 'home' %}" class="button">Home</a>
-    <a href="{% url 'view_cart' %}" class="button">Proceed to Order</a>
+    <a href="{% url 'view_cart' %}" class="button">View Cart</a>
 </body>
 </html>
