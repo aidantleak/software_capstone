@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <a type="submit" href="{% url 'menu' %}" class="button">Register</a>
+        <a href="{% url 'login' %}">Already have an account? Login here</a>
+        <script>
+            function redirectToLogin() {
+                window.location.href = '{% url "login" %}'; 
+            }
+        </script>
+    </form>
+</body>
+</html>
