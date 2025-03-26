@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Triton Pub</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .banner {
+            background-color: #0b1a3d;
+            color: white;
+            padding: 60px 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .banner h1 {
+            font-size: 3.5em;
+            margin: 0;
+        }
+        .container {
+            padding: 50px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .container p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6em;
+            color: #333;
+        }
+        .hours {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 700px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .hours h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #0b1a3d;
+        }
+        .hours p {
+            font-size: 1.1em;
+            margin: 5px 0;
+            color: #444;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 15px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #007777;
+            transform: scale(1.03);
+        }
+        @media screen and (max-width: 600px) {
+            .banner h1 {
+                font-size: 2.5em;
+            }
+            .container p, .hours p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>Welcome to Triton Pub</h1>
+    </div>
+
+    <div class="container">
+        <p>The Triton Pub is a great place to be around friends, grab some food, relax, get school work done, or just hang out. There are often events held at the Pub such as live school concerts and movie nights, creating a fun and lively environment. Whether you're looking for a quick bite, a full meal, or just a place to chill, the Triton Pub has something for everyone.</p>
+        <a href="{% url 'menu' %}" class="button">View Menu</a>
+        <a href="{% url 'register' %}" class="button">Order Now</a>
+    </div>
+
+    <div class="hours">
+        <h2>Hours of Operation</h2>
+        <p><strong>Retail Hours:</strong> Monday – Sunday, 11:00 AM – 10:00 PM</p>
+        <p><strong>Lunch Meal Swipe:</strong> 11:00 AM – 2:00 PM</p>
+        <p><strong>Dinner Meal Swipe:</strong> 7:00 PM – 10:00 PM</p>
+    </div>
+</body>
+</html>

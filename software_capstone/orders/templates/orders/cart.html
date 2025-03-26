@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Triton Pub</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .banner {
+            background-color: #0b1a3d;
+            color: white;
+            padding: 50px 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .banner h1 {
+            font-size: 3.2em;
+            margin: 0;
+        }
+        .cart-container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .cart-item {
+            border-bottom: 1px solid #ccc;
+            padding: 15px 0;
+        }
+        .cart-item img {
+            width: 100px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .cart-item p {
+            margin: 6px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 20px 10px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #007777;
+            transform: scale(1.03);
+        }
+        @media screen and (max-width: 600px) {
+            .banner h1 {
+                font-size: 2.2em;
+            }
+            .cart-item img {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>Your Cart</h1>
+    </div>
+
+    <div class="cart-container">
+        {% if cart %}
+            {% for item in cart %}
+                <div class="cart-item">
+                    {% if item.image %}
+                        <img src="{{ item.image }}" alt="{{ item.name }}">
+                    {% endif %}
+                    <p><strong>{{ item.name }}</strong></p>
+                    <p>Side: {{ item.side }}</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Price: ${{ item.price }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'menu' %}" class="button">Continue Shopping</a>
+    <a href="{% url 'place_order' %}" class="button">Place Order</a>
+</body>
+</html>

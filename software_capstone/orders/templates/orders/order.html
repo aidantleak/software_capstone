@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order - Triton Pub</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .banner {
+            background-color: #0b1a3d;
+            color: white;
+            padding: 60px 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .banner h1 {
+            font-size: 3.5em;
+            margin: 0;
+        }
+        .container {
+            padding: 50px 20px;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+        .form-container label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 15px;
+            color: #0b1a3d;
+        }
+        .form-container input,
+        .form-container select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: "Segoe UI", sans-serif;
+            box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #007777;
+            transform: scale(1.03);
+        }
+        .nav-buttons {
+            margin-top: 30px;
+        }
+        .nav-buttons a {
+            margin: 0 10px;
+        }
+        @media screen and (max-width: 600px) {
+            .banner h1 {
+                font-size: 2.5em;
+            }
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>Order from Triton Pub</h1>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <form action="{% url 'order_placed' %}" method="POST">
+                {% csrf_token %}
+
+                <label for="{{ form.meal.id_for_label }}">Select Your Meal:</label>
+                {{ form.meal }}
+
+                <label for="{{ form.quantity.id_for_label }}">Quantity:</label>
+                {{ form.quantity }}
+
+                <button type="submit" class="button">Place Order</button>
+            </form>
+        </div>
+        <div class="nav-buttons">
+            <a href="{% url 'menu' %}" class="button">Back to Menu</a>
+            <a href="{% url 'home' %}" class="button">Home</a>
+        </div>
+    </div>
+</body>
+</html>
