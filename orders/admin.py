@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Meal
+from .models import *
 
 @admin.register(Meal)
 class MealAdmin(admin.ModelAdmin):
@@ -15,3 +15,9 @@ class MealAdmin(admin.ModelAdmin):
     image_preview.allow_tags = True
     image_preview.short_description = 'Image'
     
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'status', 'created_at', 'favorite')
+    list_filter = ('status', 'favorite', 'created_at')
+    search_fields = ('user__username',)
+    list_editable = ('status', 'favorite')

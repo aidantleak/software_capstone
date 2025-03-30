@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Order History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        h2 {
+            color: navy;
+            margin-top: 40px;
+        }
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+        }
+        .order-card p {
+            margin: 5px 0;
+        }
+        .favorite-tag {
+            color: gold;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Order History</h1>
+
+    <h2>⭐ Favorite Orders</h2>
+    {% if favorite_orders %}
+        {% for order in favorite_orders %}
+            <div class="order-card">
+                <p><strong>Order #{{ order.id }}</strong> - {{ order.created_at }}</p>
+                <p>Status: {{ order.status }}</p>
+                <p class="favorite-tag">★ Favorited</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No favorite orders yet.</p>
+    {% endif %}
+
+    <h2>📦 All Completed Orders</h2>
+    {% if all_orders %}
+        {% for order in all_orders %}
+            <div class="order-card">
+                <p><strong>Order #{{ order.id }}</strong> - {{ order.created_at }}</p>
+                <p>Status: {{ order.status }}</p>
+                {% if order.favorite %}
+                    <p class="favorite-tag">★ Favorited</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You haven’t placed any completed orders yet.</p>
+    {% endif %}
+
+    <a href="{% url 'menu' %}">⬅️ Back to Menu</a>
+</body>
+</html>

@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegistrationForm , CustomUserCreationForm
+from django.http import JsonResponse
 
 def menu(request):
     meals = Meal.objects.all()
@@ -27,7 +28,7 @@ def place_order(request):
             price_at_order=item['price']
         )
     request.session['cart'] = []
-    return redirect('order_placed')
+    return redirect('order_placed', order_id=order.id)
     request.session['cart'] = []
 
     # Send email to admin
@@ -70,10 +71,7 @@ def add_to_cart(request, meal_id):
 
 def view_cart(request):
     cart = request.session.get('cart', [])
-    return render(request, 'orders/cart.html', {'cart': cart})
-
-def order_placed(request):
-    return render(request, 'orders/order_placed.html')
+    return render(request, 'orders/cart.html', {'cart': cart})  
 
 
 def register(request):
@@ -97,3 +95,25 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'orders/login.html', {'form': form})
+
+def order_history(request):
+    all_orders = Order.objects.filter(status='completed').order_by('-created_at')
+    favorite_orders = all_orders.filter(favorite=True)
+
+    context = {
+        'all_orders': all_orders,
+        'favorite_orders': favorite_orders,
+    }
+    return render(request, 'orders/order_history.html', context)
+
+def check_order_status(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+        return JsonResponse({'status': order.status})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error'}, status=404)
+
+def order_placed(request, order_id):
+    order = Order.objects.get(id=order_id)
+    return render(request, 'orders/order_placed.html', {'order': order})
+

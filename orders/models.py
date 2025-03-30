@@ -47,10 +47,13 @@ class Order(models.Model):
             ('pending', 'Pending'),
             ('preparing', 'Preparing'),
             ('completed', 'Completed'),
+            ('canceled', 'Canceled'),
         ],
         default='pending'
+        
     )
     created_at = models.DateTimeField(auto_now_add=True)  # Time when order is placed
+    favorite = models.BooleanField(default=False)  # Toggle if the order is a favorite
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username if self.user else 'Guest'}"
