@@ -1,10 +1,8 @@
 from django.shortcuts import render, redirect
-from .models import *
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import views as auth_views
+from .models import Meal, Order, OrderItem
+from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import RegistrationForm , CustomUserCreationForm
+from .forms import CustomUserCreationForm
 from django.http import JsonResponse
 
 def menu(request):
