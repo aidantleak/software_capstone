@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 def menu(request):
     meals = Meal.objects.all()
@@ -12,6 +13,7 @@ def menu(request):
 def home(request):
     return render(request, 'orders/home.html')
 
+@login_required
 def place_order(request):
     cart = request.session.get('cart', [])
     if not cart:
@@ -27,7 +29,7 @@ def place_order(request):
         )
     request.session['cart'] = []
     return redirect('order_placed', order_id=order.id)
-    request.session['cart'] = []
+
 
     # Send email to admin
     admin_email = settings.ADMIN_EMAIL 
@@ -89,13 +91,19 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')  # Redirect to a home page after login
-    else:
-        form = AuthenticationForm()
-    return render(request, 'orders/login.html', {'form': form})
+            print("Logged in as:", user.username)
+            return redirect('menu')  # Redirect to last visited page after login
 
+    else:
+
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+
+
+@login_required
 def order_history(request):
-    all_orders = Order.objects.filter(status='completed').order_by('-created_at')
+    all_orders = Order.objects.filter(user=request.user, status='completed').order_by('-created_at')
     favorite_orders = all_orders.filter(favorite=True)
 
     context = {
