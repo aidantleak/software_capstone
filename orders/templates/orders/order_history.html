@@ -36,7 +36,9 @@
     {% if favorite_orders %}
         {% for order in favorite_orders %}
             <div class="order-card">
-                <p><strong>Order #{{ order.id }}</strong> - {{ order.created_at }}</p>
+                <a href="{% url 'order_details' order.id %}">
+                    <strong>Order #{{ order.id }}</strong> - {{ order.created_at|date:"M d, Y H:i" }}
+                </a>
                 <p>Status: {{ order.status }}</p>
                 <p class="favorite-tag">★ Favorited</p>
             </div>
@@ -49,7 +51,9 @@
     {% if all_orders %}
         {% for order in all_orders %}
             <div class="order-card">
-                <p><strong>Order #{{ order.id }}</strong> - {{ order.created_at }}</p>
+                <a href="{% url 'order_details' order.id %}">
+                    <strong>Order #{{ order.id }}</strong> - {{ order.created_at|date:"M d, Y H:i" }}
+                </a>
                 <p>Status: {{ order.status }}</p>
                 {% if order.favorite %}
                     <p class="favorite-tag">★ Favorited</p>

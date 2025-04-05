@@ -21,7 +21,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('order-history/', order_history, name='order_history'),
     path('check-status/<int:order_id>/', views.check_order_status, name='check_order_status'),
- 
+    path('order-details/<int:order_id>/', views.order_details, name='order_details'),
+    path('toggle-favorite-order/<int:order_id>/', views.toggle_favorite_order, name='toggle_favorite_order'),
+    path('reorder/<int:order_id>/', views.reorder_order, name='reorder_order'),
+
 
     
 ]

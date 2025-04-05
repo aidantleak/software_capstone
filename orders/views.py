@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 def menu(request):
     meals = Meal.objects.all()
@@ -123,3 +124,42 @@ def order_placed(request, order_id):
     order = Order.objects.get(id=order_id)
     return render(request, 'orders/order_placed.html', {'order': order})
 
+@login_required
+def order_details(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = OrderItem.objects.filter(order=order)
+    return render(request, 'orders/order_details.html', {
+        'order': order,
+        'items': items,
+    })
+
+@login_required
+def toggle_favorite_order(request, order_id):
+    order = Order.objects.get(id=order_id, user=request.user)
+    order.favorite = not order.favorite
+    order.save()
+    return redirect('order_details', order_id=order_id)
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def reorder_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
+        return redirect('order_history')  # fallback if someone tries to reorder someone else’s order
+
+    cart = []
+
+    for item in order.orderitem_set.all():
+        cart.append({
+            'meal_id': item.meal.id,
+            'name': item.meal.name,
+            'price': float(item.meal.price),  # Use current price
+            'side': item.meal.side,
+            'quantity': item.quantity,
+            'image': item.meal.image.url if item.meal.image else None,
+        })
+
+    request.session['cart'] = cart
+    return redirect('view_cart')
