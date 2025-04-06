@@ -1,23 +1,93 @@
-{% load static %}
-<link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
-<h2>Order #{{ order.id }}</h2>
-<p>Status: {{ order.get_status_display }}</p>
-<p>Placed on: {{ order.created_at }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Triton Pub</title>
+    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .banner {
+            background-color: #0b1a3d;
+            color: white;
+            padding: 60px 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .banner h1 {
+            font-size: 3.5em;
+            margin: 0;
+        }
+        .content {
+            padding: 40px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+        .content h2 {
+            color: #0b1a3d;
+            margin-bottom: 10px;
+        }
+        .content p, .content li {
+            font-size: 1.1em;
+            margin: 8px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 20px 10px 0 0;
+            font-size: 16px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #007777;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>Triton Pub</h1>
+    </div>
 
-<ul>
-  {% for item in items %}
-    <li>{{ item.quantity }} x {{ item.meal.name }} — ${{ item.price_at_order }}</li>
-  {% endfor %}
-</ul>
+    <div class="content">
+        <h2>Order #{{ order.id }}</h2>
+        <p>Status: {{ order.get_status_display }}</p>
+        <p>Placed on: {{ order.created_at }}</p>
 
-<a href="{% url 'order_history' %}">← Back to Order History</a>
+        <ul>
+          {% for item in items %}
+            <li>{{ item.quantity }} x {{ item.meal.name }} — ${{ item.price_at_order }}</li>
+          {% endfor %}
+        </ul>
 
-<form method="POST" action="{% url 'toggle_favorite_order' order.id %}">
-    {% csrf_token %}
-    {% if order.favorite %}
-        <button type="submit" class="button">💔 Unfavorite</button>
-    {% else %}
-        <button type="submit" class="button">❤️ Favorite this order</button>
-    {% endif %}
-</form>
-<a href="{% url 'reorder_order' order.id %}" class="button">Reorder This</a>
+        <form method="POST" action="{% url 'toggle_favorite_order' order.id %}">
+            {% csrf_token %}
+            {% if order.favorite %}
+                <button type="submit" class="button">💔 Unfavorite</button>
+            {% else %}
+                <button type="submit" class="button">❤️ Favorite this order</button>
+            {% endif %}
+        </form>
+
+        <a href="{% url 'reorder_order' order.id %}" class="button">🔁 Reorder This</a>
+        <a href="{% url 'order_history' %}" class="button">⬅️ Back to Order History</a>
+    </div>
+</body>
+</html>
