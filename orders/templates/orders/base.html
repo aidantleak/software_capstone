@@ -30,6 +30,20 @@
         .navbar a:hover {
             text-decoration: underline;
         }
+        .navbar form {
+            display: inline;
+        }
+        .navbar button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .navbar button:hover {
+            text-decoration: underline;
+        }
         .banner h1 {
             font-size: 3em;
             margin: 0;
@@ -89,7 +103,10 @@
         <div>
             {% if user.is_authenticated %}
                 <span>Hi, {{ user.username }}</span> |
-                <a href="{% url 'logout' %}">Logout</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
             {% else %}
                 <a href="{% url 'login' %}">Login</a>
             {% endif %}
