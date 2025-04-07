@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="banner">
+    <h1>Edit Your Profile</h1>
+</div>
+
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+        <label for="phone_number">Phone Number</label>
+        <input type="text" name="phone_number" value="{{ user.userprofile.phone_number }}" placeholder="e.g. 123-456-7890">
+
+        <label for="dorm_location">Dorm Location</label>
+        <input type="text" name="dorm_location" value="{{ user.userprofile.dorm_location }}" placeholder="e.g. Triton Hall 204">
+
+        <button type="submit" class="button">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,129 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Placed - Triton Pub</title>
-    <style>
-        body {
-            font-family: "Segoe UI", sans-serif;
-            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        .banner {
-            background-color: #0b1a3d;
-            color: white;
-            padding: 50px 20px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        .banner h1 {
-            font-size: 3em;
-            margin: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        .container p {
-            font-size: 1.2em;
-            color: #333;
-            margin-top: 10px;
-        }
-        .button {
-            display: inline-block;
-            padding: 15px 30px;
-            margin: 30px 10px 0;
-            font-size: 18px;
-            color: white;
-            background-color: teal;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .button:hover {
-            background-color: #007777;
-            transform: scale(1.03);
-        }
-        .progress-bar {
-            margin-top: 30px;
-            width: 100%;
-            background-color: #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .progress-bar-fill {
-            height: 20px;
-            width: 0%;
-            background-color: teal;
-     
-            transition: width 0.5s ease-in-out;
-        }
-        @keyframes fillBar {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-    </style>
-</head>
-<body>
-    <div class="banner">
-        <h1>Order Placed Successfully!</h1>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="banner">
+    <h1>Order Placed Successfully!</h1>
+</div>
+
+<div class="container">
+    <p id="status-message">🎉 Thank you for your order!</p>
+    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+    <p><strong>Delivery Method:</strong> {{ order.get_delivery_method_display }}</p>
+    {% if order.delivery_method == 'dorm' %}
+        <p><strong>Dorm Location:</strong> {{ order.dorm_location }}</p>
+    {% endif %}
+    <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number }}</p>
+
+    <div class="progress-bar">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
     </div>
 
-    <div class="container">
-        <p id="status-message">🎉 Thank you for your order!</p>
-    
-        <div class="progress-bar">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
-        </div>
+    <a href="{% url 'menu' %}" class="button">Return to Menu</a>
+    <a href="{% url 'home' %}" class="button">Back to Home</a>
+</div>
 
-        <a href="{% url 'menu' %}" class="button">Return to Menu</a>
-        <a href="{% url 'home' %}" class="button">Back to Home</a>
-    </div>
-    
-    <script>
-        const orderId = "{{ order.id }}";
-        const progressBar = document.getElementById('progress-bar-fill');
-        const statusMsg = document.getElementById('status-message');
-    
-        function updateProgress(status) {
-            if (status === 'pending') {
-                progressBar.style.width = '33%';
-                statusMsg.innerText = '🎉 Thank you for your order! Your order is pending. Hang tight!';
-            } else if (status === 'preparing') {
-                progressBar.style.width = '66%';
-                statusMsg.innerText = '👨‍🍳 Your order is being prepared!';
-            } else if (status === 'completed') {
-                progressBar.style.width = '100%';
-                statusMsg.innerText = '✅ Your order is ready!';
-            } else if (status === 'canceled') {
-                progressBar.style.width = '100%';
-                statusMsg.innerText = '❌ Your order was canceled.';
-            }
+<script>
+    const orderId = "{{ order.id }}";
+    const progressBar = document.getElementById('progress-bar-fill');
+    const statusMsg = document.getElementById('status-message');
+
+    function updateProgress(status) {
+        if (status === 'pending') {
+            progressBar.style.width = '33%';
+            statusMsg.innerText = '🎉 Thank you for your order! Your order is pending. Hang tight!';
+        } else if (status === 'preparing') {
+            progressBar.style.width = '66%';
+            statusMsg.innerText = '👨‍🍳 Your order is being prepared!';
+        } else if (status === 'completed') {
+            progressBar.style.width = '100%';
+            statusMsg.innerText = '✅ Your order is ready!';
+        } else if (status === 'canceled') {
+            progressBar.style.width = '100%';
+            statusMsg.innerText = '❌ Your order was canceled.';
         }
-    
-        function pollStatus() {
-            fetch(`/check-status/${orderId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    updateProgress(data.status);
-                    if (data.status !== 'completed' && data.status !== 'canceled') {
-                        setTimeout(pollStatus, 5000); // check again in 5 seconds
-                    }
-                });
-        }
-    
-        pollStatus();
-        // We would need this if we have trouble with the browser caching the request. Itll block the cache.
-        // fetch(`/check-status/${orderId}/?t=${new Date().getTime()}`)
-    </script>
-</body>
-</html>
+    }
+
+    function pollStatus() {
+        fetch(`/check-status/${orderId}/`)
+            .then(response => response.json())
+            .then(data => {
+                updateProgress(data.status);
+                if (data.status !== 'completed' && data.status !== 'canceled') {
+                    setTimeout(pollStatus, 5000);  // check again in 5 seconds
+                }
+            });
+    }
+
+    pollStatus();
+</script>
+{% endblock %}

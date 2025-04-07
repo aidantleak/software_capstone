@@ -1,63 +1,34 @@
-from django.shortcuts import render, redirect
-from .models import Meal, Order, OrderItem
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import CustomUserCreationForm
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
 
-def menu(request):
-    meals = Meal.objects.all()
-    return render(request, 'orders/menu.html', {'meals': meals})
+from .models import Meal, Order, OrderItem, UserProfile
+from .forms import CustomUserCreationForm
 
 def home(request):
     return render(request, 'orders/home.html')
 
 @login_required
-def place_order(request):
+def view_cart(request):
     cart = request.session.get('cart', [])
-    if not cart:
-        return redirect('menu')
-    order = Order.objects.create(user=request.user if request.user.is_authenticated else None)
-    for item in cart:
-        meal = Meal.objects.get(id=item['meal_id'])
-        OrderItem.objects.create(
-            order=order,
-            meal=meal,
-            quantity=item['quantity'],
-            price_at_order=item['price']
-        )
-    request.session['cart'] = []
-    return redirect('order_placed', order_id=order.id)
+    return render(request, 'orders/cart.html', {'cart': cart})
 
+def menu(request):
+    meals = Meal.objects.all()
+    return render(request, 'orders/menu.html', {'meals': meals})
 
-    # Send email to admin
-    admin_email = settings.ADMIN_EMAIL 
-    send_mail(
-        'New Order Placed',
-        f'An order has been placed with the following items:\n\n{order_items}',
-        settings.DEFAULT_FROM_EMAIL,
-        [admin_email],
-        fail_silently=False,
-    )
-    # Send email to the user
-    if request.user.is_authenticated:
-        user_email = request.user.email
-        send_mail(
-            'Order Confirmation',
-            f'Thank you for your order! Here are the details:\n\n{order_items}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user_email],
-            fail_silently=False,
-        )
-
-    return redirect('order_placed')
-
+@login_required
 def add_to_cart(request, meal_id):
-    meal = Meal.objects.get(id=meal_id)
+    meal = get_object_or_404(Meal, id=meal_id)
     side = request.POST.get('side')
     quantity = int(request.POST.get('quantity', 1))
+    special_request = request.POST.get('special_request', '')
+
     cart = request.session.get('cart', [])
     cart.append({
         'meal_id': meal.id,
@@ -65,53 +36,89 @@ def add_to_cart(request, meal_id):
         'price': float(meal.price),
         'side': side,
         'quantity': quantity,
+        'special_request': special_request,
         'image': meal.image.url if meal.image else None,
     })
     request.session['cart'] = cart
     return redirect('menu')
 
-def view_cart(request):
+@login_required
+def place_order(request):
     cart = request.session.get('cart', [])
-    return render(request, 'orders/cart.html', {'cart': cart})  
+    if not cart:
+        return redirect('menu')
 
+    payment_method = request.POST.get('payment_method')
+    delivery_method = request.POST.get('delivery_method')
+    dorm_input = request.POST.get('dorm') or request.user.userprofile.dorm_location
 
-def register(request):
+    user_profile = request.user.userprofile
+    total_cost = sum(item['price'] * item['quantity'] for item in cart)
+    swipe_eligible = any(Meal.objects.get(id=item['meal_id']).mealSwipe for item in cart)
+
+    if payment_method == 'meal_swipe':
+        if not swipe_eligible:
+            messages.error(request, "No items in your cart are eligible for meal swipe.")
+            return redirect('view_cart')
+        if user_profile.meal_swipes < 1:
+            messages.error(request, "You do not have enough meal swipes.")
+            return redirect('view_cart')
+        user_profile.meal_swipes -= 1
+
+    elif payment_method == 'flex_dollars':
+        if user_profile.flex_dollars < total_cost:
+            messages.error(request, "You do not have enough flex dollars.")
+            return redirect('view_cart')
+        user_profile.flex_dollars -= total_cost
+
+    user_profile.dorm_location = dorm_input
+    user_profile.save()
+
+    order = Order.objects.create(
+        user=request.user,
+        payment_method=payment_method,
+        delivery_method=delivery_method,
+        dorm_location=dorm_input,
+        phone_number=user_profile.phone_number
+    )
+
+    for item in cart:
+        meal = Meal.objects.get(id=item['meal_id'])
+        special_request = item.get('special_request', '')
+        OrderItem.objects.create(
+            order=order,
+            meal=meal,
+            quantity=item['quantity'],
+            price_at_order=item['price'],
+            special_request=special_request
+        )
+
+    request.session['cart'] = []
+    return redirect('order_placed', order_id=order.id)
+
+@login_required
+def edit_account(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('place_order')  # Redirect to the order page
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'orders/register.html', {'form': form})
+        phone_number = request.POST.get('phone_number')
+        dorm_location = request.POST.get('dorm_location')
 
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            print("Logged in as:", user.username)
-            return redirect('menu')  # Redirect to last visited page after login
+        user_profile = request.user.userprofile
+        user_profile.phone_number = phone_number
+        user_profile.dorm_location = dorm_location
+        user_profile.save()
 
-    else:
-
-        form = AuthenticationForm()
-    return render(request, 'registration/login.html', {'form': form})
-
-
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('edit_account')
+    return render(request, 'orders/edit_account.html')
 
 @login_required
 def order_history(request):
     all_orders = Order.objects.filter(user=request.user, status='completed').order_by('-created_at')
     favorite_orders = all_orders.filter(favorite=True)
-
-    context = {
+    return render(request, 'orders/order_history.html', {
         'all_orders': all_orders,
-        'favorite_orders': favorite_orders,
-    }
-    return render(request, 'orders/order_history.html', context)
+        'favorite_orders': favorite_orders
+    })
 
 def check_order_status(request, order_id):
     try:
@@ -119,10 +126,6 @@ def check_order_status(request, order_id):
         return JsonResponse({'status': order.status})
     except Order.DoesNotExist:
         return JsonResponse({'status': 'error'}, status=404)
-
-def order_placed(request, order_id):
-    order = Order.objects.get(id=order_id)
-    return render(request, 'orders/order_placed.html', {'order': order})
 
 @login_required
 def order_details(request, order_id):
@@ -135,31 +138,54 @@ def order_details(request, order_id):
 
 @login_required
 def toggle_favorite_order(request, order_id):
-    order = Order.objects.get(id=order_id, user=request.user)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     order.favorite = not order.favorite
     order.save()
     return redirect('order_details', order_id=order_id)
-
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def reorder_order(request, order_id):
     try:
         order = Order.objects.get(id=order_id, user=request.user)
     except Order.DoesNotExist:
-        return redirect('order_history')  # fallback if someone tries to reorder someone else’s order
+        return redirect('order_history')
 
     cart = []
-
     for item in order.orderitem_set.all():
         cart.append({
             'meal_id': item.meal.id,
             'name': item.meal.name,
-            'price': float(item.meal.price),  # Use current price
+            'price': float(item.meal.price),
             'side': item.meal.side,
             'quantity': item.quantity,
+            'special_request': item.special_request,
             'image': item.meal.image.url if item.meal.image else None,
         })
-
     request.session['cart'] = cart
     return redirect('view_cart')
+
+def order_placed(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/order_placed.html', {'order': order})
+
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('menu')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'orders/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('menu')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triton Pub</title>
+    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #0b1a3d;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .banner h1 {
+            font-size: 3em;
+            margin: 0;
+        }
+        .container {
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .hours {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 700px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        .hours h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #0b1a3d;
+        }
+        .hours p {
+            font-size: 1.1em;
+            margin: 5px 0;
+            color: #444;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 15px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #007777;
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'menu' %}">Menu</a>
+            <a href="{% url 'view_cart' %}">Cart</a>
+            <a href="{% url 'order_history' %}">Orders</a>
+            <a href="{% url 'account' %}">Account</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Hi, {{ user.username }}</span> |
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
