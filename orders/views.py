@@ -97,6 +97,11 @@ def place_order(request):
     return redirect('order_placed', order_id=order.id)
 
 @login_required
+def account(request):
+    profile = request.user.userprofile
+    return render(request, 'orders/account.html', {'profile': profile})
+
+@login_required
 def edit_account(request):
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')
@@ -108,7 +113,7 @@ def edit_account(request):
         user_profile.save()
 
         messages.success(request, 'Profile updated successfully!')
-        return redirect('edit_account')
+        return redirect('account')
     return render(request, 'orders/edit_account.html')
 
 @login_required
@@ -189,8 +194,3 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
-
-    @login_required
-def account(request):
-    profile = request.user.userprofile
-    return render(request, 'orders/account.html', {'profile': profile})
