@@ -1,69 +1,54 @@
 {% extends 'orders/base.html' %}
-
 {% load static %}
-
-{% block title %}Your Cart - Triton Pub{% endblock %}
 
 {% block content %}
 <div class="banner">
-    <h1>Your Cart</h1>
+    <h1 style="text-align: center;">Your Cart</h1>
 </div>
 
-<div class="cart-container">
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
     {% if cart %}
         {% for item in cart %}
-            <div class="cart-item">
+            <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; background: white;">
                 {% if item.image %}
-                    <img src="{{ item.image }}" alt="{{ item.name }}">
+                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width: 120px; height: 120px; object-fit: cover;">
                 {% endif %}
-                <p><strong>{{ item.name }}</strong></p>
-                <p>Side: {{ item.side }}</p>
-                <p>Quantity: {{ item.quantity }}</p>
-                <p>Price: ${{ item.price }}</p>
-                {% if item.special_request %}
-                    <p><strong>Request:</strong> {{ item.special_request }}</p>
-                {% endif %}
+                <div style="padding: 15px; flex-grow: 1;">
+                    <h3>{{ item.name }}</h3>
+                    <p>Side: {{ item.side }}</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Special Request: {{ item.special_request|default:"None" }}</p>
+                    <p><strong>Price:</strong> ${{ item.price|floatformat:2 }}</p>
+                </div>
             </div>
         {% endfor %}
 
-        <form method="post" action="{% url 'place_order' %}">
+        <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
             {% csrf_token %}
-            <div class="form-section">
-                <label for="payment_method">Payment Method</label>
-                <select name="payment_method" required>
-                    <option value="">Select</option>
-                    <option value="meal_swipe">Meal Swipe</option>
-                    <option value="flex_dollars">Flex Dollars</option>
-                </select>
+            <label for="payment_method"><strong>Payment Method:</strong></label><br>
+            <select name="payment_method" required style="margin-bottom: 15px;">
+                <option value="">-- Select --</option>
+                <option value="meal_swipe">Meal Swipe</option>
+                <option value="flex_dollars">Flex Dollars</option>
+            </select><br>
 
-                <label for="delivery_method">Delivery Method</label>
-                <select name="delivery_method" id="delivery_method" onchange="toggleDormField()" required>
-                    <option value="">Select</option>
-                    <option value="pickup">Pickup</option>
-                    <option value="dorm">Dorm Delivery</option>
-                </select>
+            <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
+            <select name="delivery_method" required style="margin-bottom: 15px;">
+                <option value="">-- Select --</option>
+                <option value="pickup">Pickup</option>
+                <option value="dorm">Dorm Delivery</option>
+            </select><br>
 
-                <div id="dormEntry" style="display:none;">
-                    <label for="dorm">Enter Dorm Room/Location</label>
-                    <input type="text" name="dorm" value="{{ user.userprofile.dorm_location }}" placeholder="e.g. Triton Hall 204">
-                </div>
-
-                <label for="phone">Phone Number</label>
-                <input type="text" name="phone" value="{{ user.userprofile.phone_number }}" placeholder="e.g. 123-456-7890">
-            </div>
+            <label for="dorm"><strong>Dorm Location (if delivery):</strong></label><br>
+            <input type="text" name="dorm" placeholder="Enter dorm room..." style="width: 100%; margin-bottom: 15px;"><br>
 
             <button type="submit" class="button">Place Order</button>
         </form>
     {% else %}
-        <p>Your cart is empty.</p>
+        <p style="text-align: center;">Your cart is empty.</p>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{% url 'menu' %}" class="button">Back to Menu</a>
+        </div>
     {% endif %}
 </div>
-
-<script>
-    function toggleDormField() {
-        const delivery = document.getElementById("delivery_method");
-        const dormField = document.getElementById("dormEntry");
-        dormField.style.display = delivery.value === "dorm" ? "block" : "none";
-    }
-</script>
 {% endblock %}
