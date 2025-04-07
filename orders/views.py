@@ -189,3 +189,8 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
+
+    @login_required
+def account(request):
+    profile = request.user.userprofile
+    return render(request, 'orders/account.html', {'profile': profile})
