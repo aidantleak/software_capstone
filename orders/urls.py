@@ -23,6 +23,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 
-    # Edit Account
+    # Account Pages
+    path('account/', views.account, name='account'),
     path('edit-account/', views.edit_account, name='edit_account'),
 ]
