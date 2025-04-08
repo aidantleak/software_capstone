@@ -1,5 +1,6 @@
 {% extends 'orders/base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block content %}
 <h2 style="text-align:center; margin-top: 20px;">Triton Service - Order Management</h2>
@@ -64,7 +65,7 @@
                         {% elif order.status == 'canceled' %} background-color: crimson;
                         {% else %} background-color: gray;
                         {% endif %}">
-                        {{ order.status|replace:"_"," "|title }}
+                        {{ order.status|beautify_status }}
                     </span>
                 </td>
                 <td>

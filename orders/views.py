@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from decimal import Decimal
 
 from .models import Meal, Order, OrderItem, UserProfile
 from .forms import CustomUserCreationForm
@@ -44,6 +45,10 @@ def add_to_cart(request, meal_id):
     return redirect('menu')
 
 @login_required
+
+
+
+
 def place_order(request):
     cart = request.session.get('cart', [])
     if not cart:
@@ -54,7 +59,7 @@ def place_order(request):
     dorm_input = request.POST.get('dorm') or request.user.userprofile.dorm_location
 
     user_profile = request.user.userprofile
-    total_cost = sum(item['price'] * item['quantity'] for item in cart)
+    total_cost = sum(Decimal(item['price']) * item['quantity'] for item in cart)
     swipe_eligible = any(Meal.objects.get(id=item['meal_id']).mealSwipe for item in cart)
 
     if payment_method == 'meal_swipe':
