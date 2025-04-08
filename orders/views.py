@@ -45,10 +45,6 @@ def add_to_cart(request, meal_id):
     return redirect('menu')
 
 @login_required
-
-
-
-
 def place_order(request):
     cart = request.session.get('cart', [])
     if not cart:

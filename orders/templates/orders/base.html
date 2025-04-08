@@ -106,10 +106,10 @@
         <div>
             {% if user.is_authenticated %}
                 <span>Hi, {{ user.username }}</span> |
-                <form method="POST" action="{% url 'logout' %}">
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
                     {% csrf_token %}
-                    <button type="submit">Logout</button>
                 </form>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}">Login</a>
             {% endif %}

@@ -20,7 +20,7 @@ urlpatterns = [
 
     # Auth
     path('register/', views.register, name='register'),
-    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
+    path('accounts/logout/', LogoutView.as_view(), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
 
     # Account Pages

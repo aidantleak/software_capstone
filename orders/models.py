@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User  
+from django.contrib.auth.forms import UserCreationForm
 
 class SideChoices(models.TextChoices):
     FRIES = 'fries', 'Fries'
@@ -37,7 +38,17 @@ class Meal(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    
+    meal = models.ForeignKey('Meal', on_delete=models.CASCADE)
+    special_request = models.TextField(null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1)
+    side = models.CharField(max_length=50, choices=[
+        ('fries', 'Fries'),
+        ('sweet_potato_fries', 'Sweet Potato Fries'),
+        ('chips', 'Chips'),
+        ('fruit', 'Fruit'),
+    ], default='fries')
+    email = models.EmailField(null=False, blank=False)
+    phone_number = models.CharField(max_length=20, null=False, blank=False)
     status = models.CharField(
         max_length=20,
         choices=[
@@ -48,7 +59,6 @@ class Order(models.Model):
         ],
         default='pending'
     )
-
     payment_method = models.CharField(
         max_length=20,
         choices=[
@@ -58,7 +68,6 @@ class Order(models.Model):
         null=True,
         blank=True
     )
-
     delivery_method = models.CharField(
         max_length=10,
         choices=[
@@ -68,7 +77,6 @@ class Order(models.Model):
         null=True,
         blank=True
     )
-
     dorm_location = models.CharField(max_length=100, null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
 
@@ -97,3 +105,4 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
