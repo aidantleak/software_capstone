@@ -113,6 +113,10 @@ def edit_account(request):
     return render(request, 'orders/edit_account.html')
 
 @login_required
+def account(request):
+    return render(request, 'orders/account.html')
+
+@login_required
 def order_history(request):
     all_orders = Order.objects.filter(user=request.user).order_by('-created_at')
     favorite_orders = all_orders.filter(favorite=True)
