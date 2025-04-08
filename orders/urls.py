@@ -26,4 +26,11 @@ urlpatterns = [
     # Account Pages
     path('account/', views.account, name='account'),
     path('edit-account/', views.edit_account, name='edit_account'),
+    
+    # Cart Count
+    path('get-cart-count/', views.get_cart_count, name='get_cart_count'),
+
+    # Triton Service
+    path('triton-service/', views.triton_service, name='triton_service'),
+    path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
 ]

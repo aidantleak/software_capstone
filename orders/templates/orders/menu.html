@@ -1,44 +1,204 @@
-{% extends 'orders/base.html' %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triton Pub Menu</title>
+    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f1f4f8);
+            margin: 0;
+            padding: 0;
+        }
 
-{% block content %}
-<div class="banner">
-    <h1 style="text-align: center;">Triton Pub Menu</h1>
-</div>
+        .navbar {
+            background-color: #0b1a3d;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
 
-<div class="container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;">
-    {% for meal in meals %}
-    <div class="card" style="width: 300px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); background-color: #fff;">
-        {% if meal.image %}
-        <img src="{{ meal.image.url }}" alt="{{ meal.name }}" style="width: 100%; height: 200px; object-fit: cover;">
-        {% endif %}
-        <div style="padding: 15px;">
-            <h3>{{ meal.name }}</h3>
-            <p>Price: ${{ meal.price }}</p>
-            <p>Category: {{ meal.get_category_display }}</p>
-            <p>Side: {{ meal.get_side_display }}</p>
-            {% if meal.mealSwipe %}
-                <p><strong>Eligible for Meal Swipe</strong></p>
+        .navbar a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .menu-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .menu-item h3 {
+            margin-top: 10px;
+        }
+
+        .menu-item p {
+            color: #444;
+        }
+
+        .form-container {
+            margin-top: 10px;
+        }
+
+        .form-container select,
+        .form-container input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .quantity-stepper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quantity-stepper input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .cart-notification {
+            display: none;
+            position: absolute;
+            background-color: green;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'menu' %}">Menu</a>
+            <a href="{% url 'view_cart' %}">Cart <span id="cart-count">0</span></a>
+            <a href="{% url 'order_history' %}">Orders</a>
+            <a href="{% url 'account' %}">Account</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Hi, {{ user.username }}</span> |
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
             {% endif %}
-            <form method="POST" action="{% url 'add_to_cart' meal.id %}">
-                {% csrf_token %}
-                <label for="side">Side:</label>
-                <select name="side">
-                    {% for key, value in meal.side.field.choices %}
-                        <option value="{{ key }}" {% if key == meal.side %}selected{% endif %}>{{ value }}</option>
-                    {% endfor %}
-                </select><br><br>
-
-                <label for="quantity">Quantity:</label>
-                <input type="number" name="quantity" min="1" value="1" style="width: 60px;"><br><br>
-
-                <label for="special_request">Special Request:</label>
-                <input type="text" name="special_request" placeholder="Any notes..." style="width: 100%;"><br><br>
-
-                <button type="submit" class="button">Add to Cart</button>
-            </form>
         </div>
     </div>
-    {% endfor %}
-</div>
-{% endblock %}
+
+    <div class="menu-container">
+        {% for meal in meals %}
+        <div class="menu-item">
+            <img src="{{ meal.image.url }}" alt="{{ meal.name }}">
+            <h3>{{ meal.name }}</h3>
+            <p>${{ meal.price }}</p>
+            <form method="post" action="{% url 'add_to_cart' meal.id %}" class="form-container">
+                {% csrf_token %}
+                <label for="side">Side</label>
+                <select name="side" id="side" required>
+                    <option value="Fries">Fries</option>
+                    <option value="Salad">Salad</option>
+                    <option value="Rice">Rice</option>
+                </select>
+
+                <div class="quantity-stepper">
+                    <button type="button" onclick="decreaseQuantity(this)">-</button>
+                    <input type="number" name="quantity" value="1" min="1" step="1">
+                    <button type="button" onclick="increaseQuantity(this)">+</button>
+                </div>
+
+                <label for="special_request">Special Request</label>
+                <textarea name="special_request" rows="3" placeholder="Enter special requests here..."></textarea>
+
+                <button type="submit">Add to Cart</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart-notification" id="cart-notification">Item added to cart!</div>
+
+    <script>
+        // Cart notification
+        function showCartNotification() {
+            const notification = document.getElementById('cart-notification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Quantity stepper
+        function increaseQuantity(button) {
+            let input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQuantity(button) {
+            let input = button.nextElementSibling;
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            fetch('/get-cart-count/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cart-count').textContent = data.count;
+                });
+        }
+
+        // Show notification when item is added to cart
+        const form = document.querySelectorAll('.form-container form');
+        form.forEach(f => {
+            f.addEventListener('submit', function(event) {
+                event.preventDefault();
+                // Add to cart logic here
+                showCartNotification();
+                updateCartCount();
+                this.submit();
+            });
+        });
+
+        // Initialize cart count on page load
+        updateCartCount();
+    </script>
+</body>
+</html>

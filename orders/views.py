@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -40,6 +40,7 @@ def add_to_cart(request, meal_id):
         'image': meal.image.url if meal.image else None,
     })
     request.session['cart'] = cart
+    messages.success(request, f'{meal.name} has been added to your cart!')
     return redirect('menu')
 
 @login_required
@@ -97,11 +98,6 @@ def place_order(request):
     return redirect('order_placed', order_id=order.id)
 
 @login_required
-def account(request):
-    profile = request.user.userprofile
-    return render(request, 'orders/account.html', {'profile': profile})
-
-@login_required
 def edit_account(request):
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')
@@ -113,12 +109,12 @@ def edit_account(request):
         user_profile.save()
 
         messages.success(request, 'Profile updated successfully!')
-        return redirect('account')
+        return redirect('edit_account')
     return render(request, 'orders/edit_account.html')
 
 @login_required
 def order_history(request):
-    all_orders = Order.objects.filter(user=request.user, status='completed').order_by('-created_at')
+    all_orders = Order.objects.filter(user=request.user).order_by('-created_at')
     favorite_orders = all_orders.filter(favorite=True)
     return render(request, 'orders/order_history.html', {
         'all_orders': all_orders,
@@ -194,3 +190,36 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
+
+# Cart count 
+def get_cart_count(request):
+    cart = request.session.get('cart', [])
+    return JsonResponse({'count': len(cart)})
+
+# Triton Service views
+
+def is_admin(user):
+    return user.is_superuser or user.is_staff
+
+@user_passes_test(is_admin)
+def triton_service(request):
+    orders = Order.objects.all().order_by('-created_at')
+    return render(request, 'orders/triton_service.html', {'orders': orders})
+
+@user_passes_test(is_admin)
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get('status')
+        if new_status:
+            if new_status.lower() == 'canceled' and order.status.lower() != 'canceled':
+                if order.payment_method == 'meal_swipe':
+                    order.user.userprofile.meal_swipes += 1
+                elif order.payment_method == 'flex_dollars':
+                    total = sum(i.quantity * i.price_at_order for i in order.orderitem_set.all())
+                    order.user.userprofile.flex_dollars += total
+                order.user.userprofile.save()
+            order.status = new_status
+            order.save()
+            messages.success(request, f"Order {order.id} updated to '{new_status}'")
+    return redirect('triton_service')
