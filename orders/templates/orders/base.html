@@ -114,9 +114,29 @@
                 <a href="{% url 'login' %}">Login</a>
             {% endif %}
         </div>
-    </div>
+    </div>   
 
     {% block content %}
     {% endblock %}
 </body>
+
+<footer style="background-color: #0b1a3d; color: white; padding: 30px 20px; text-align: center;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <img src="{% static 'favicon.png' %}" alt="Triton Pub Logo" style="width: 50px; height: 50px; margin-bottom: 10px;" />
+
+        <div style="margin: 15px 0;">
+            <a href="{% url 'home' %}" style="color: white; margin: 0 10px; text-decoration: none;">Home</a>
+            <a href="{% url 'menu' %}" style="color: white; margin: 0 10px; text-decoration: none;">Menu</a>
+            <a href="{% url 'view_cart' %}" style="color: white; margin: 0 10px; text-decoration: none;">Cart</a>
+            <a href="{% url 'order_history' %}" style="color: white; margin: 0 10px; text-decoration: none;">Orders</a>
+            <a href="{% url 'account' %}" style="color: white; margin: 0 10px; text-decoration: none;">Account</a>
+        </div>
+
+        <p style="margin-top: 15px; font-size: 0.95em;">
+            Contact Us: <a href="tel:7278648411" style="color: #aad8ff; text-decoration: none;">(727) 864-8411</a>
+        </p>
+        <p style="font-size: 0.85em; color: #bbb;">&copy; 2025 Triton's Pub. All rights reserved.</p>
+    </div>
+</footer>
+
 </html>

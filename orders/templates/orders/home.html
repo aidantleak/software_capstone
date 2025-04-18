@@ -3,11 +3,27 @@
 {% load static %}
 
 {% block content %}
+
+<style>
+    .banner {
+        text-align: center;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        text-align: center;
+        align-items: center;
+    }
+</style>
+
 <div class="banner">
-    <h1>Welcome to Triton Pub</h1>
-</div>
+    <img src="{% static 'banner.jpg' %}" alt="Triton Pub Banner" style="width: 100%; max-height: 300px; object-fit: cover;" />
+</div> 
 
 <div class="container">
+    <h1>Welcome to Triton's Pub</h1>
     <p>The Triton Pub is a great place to be around friends, grab some food, relax, get school work done, or just hang out. There are often events held at the Pub such as live school concerts and movie nights, creating a fun and lively environment. Whether you're looking for a quick bite, a full meal, or just a place to chill, the Triton Pub has something for everyone.</p>
     <a href="{% url 'menu' %}" class="button">View Menu</a>
     <a href="{% url 'register' %}" class="button">Order Now</a>

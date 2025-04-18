@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   
     {% load static %}
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Triton Pub Menu</title>
@@ -44,7 +46,8 @@
         }
 
         .menu-item {
-            background-color: #fff;
+            background-color: #0b1a3d;
+            color: white;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             padding: 15px;
@@ -53,7 +56,8 @@
 
         .menu-item img {
             width: 100%;
-            height: auto;
+            height: 300px; /* or any consistent value */
+            object-fit: cover;
             border-radius: 10px;
         }
 
@@ -62,7 +66,7 @@
         }
 
         .menu-item p {
-            color: #444;
+            color: white
         }
 
         .form-container {
@@ -70,25 +74,47 @@
         }
 
         .form-container select,
-        .form-container input[type="number"] {
-            width: 100%;
+        .form-container input[type="number"]:not(.quantity-stepper input) {
+            width: 95%;
             padding: 8px;
+            margin-top: 4px;
             margin-bottom: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
+            background-color: #fefefc;
+            color: #0b1a3d;
         }
-
         .quantity-stepper {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 3px;
         }
 
+        /* For the +, -, and number field inside the stepper */
+        .quantity-stepper button,
         .quantity-stepper input {
-            width: 50px;
-            padding: 5px;
+            height: 36px;
+            width: 36px;
+            padding: 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #fffdfd;
+            color: #0b1a3d;
+            font-weight: bold;
+            font-size: 20px;
             text-align: center;
+            box-sizing: border-box;
+            appearance: none;
+            -moz-appearance: textfield;
         }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
 
         .cart-notification {
             display: none;
@@ -100,6 +126,80 @@
             top: 10px;
             right: 10px;
         }
+
+        .form-container textarea {
+            width: 80%;
+            max-height: 30px;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #fffff1ae;
+            color: #0b1a3d;
+            font-family: inherit;
+            resize: none;
+        }
+
+        .form-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-to-cart button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 15px;
+            font-size: 18px;
+            color: white;
+            background-color: teal;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .add-to-cart button:hover {
+            background-color: #007777;
+            transform: scale(1.03);
+        }
+        
+        .cart-button-container {
+            text-align: center;
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px;
+            position: relative;
+        }
+
+        .cart-button {
+            position: relative;
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0b1a3d;
+            color: white;
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+
     </style>
 </head>
 <body>
@@ -107,19 +207,39 @@
         <div>
             <a href="{% url 'home' %}">Home</a>
             <a href="{% url 'menu' %}">Menu</a>
-            <a href="{% url 'view_cart' %}">Cart <span id="cart-count">0</span></a>
+            <a href="{% url 'view_cart' %}">Cart</a>
             <a href="{% url 'order_history' %}">Orders</a>
             <a href="{% url 'account' %}">Account</a>
+            {% if user.is_authenticated and user.is_superuser %}
+                <a href="{% url 'triton_service' %}">Triton Service</a>
+            {% endif %}
         </div>
         <div>
             {% if user.is_authenticated %}
-                <span>Hi, {{ user.username }}</span> |
-                <a href="{% url 'logout' %}">Logout</a>
+            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <span> <a href="{% url 'account' %}" style="color: white; font-weight: bold; text-decoration: none;">
+                    Hi, {{ user.username }}
+                </a></span> |
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; font-weight: bold; padding: 0;">Logout</button>
+            </form>            
             {% else %}
                 <a href="{% url 'login' %}">Login</a>
             {% endif %}
         </div>
     </div>
+
+    <div class="banner">
+        <img src="{% static 'banner.jpg' %}" alt="Triton Pub Banner" style="width: 100%; max-height: 300px; object-fit: cover;" />
+    </div> 
+
+    <div class="cart-button-container">
+        <a href="{% url 'view_cart' %}" class="cart-button">
+            🛒 Cart
+            <span id="cart-badge" class="cart-badge" style="display: none;">0</span>
+        </a>
+    </div>
+    
 
     <div class="menu-container">
         {% for meal in meals %}
@@ -136,16 +256,20 @@
                     <option value="Rice">Rice</option>
                 </select>
 
-                <div class="quantity-stepper">
-                    <button type="button" onclick="decreaseQuantity(this)">-</button>
-                    <input type="number" name="quantity" value="1" min="1" step="1">
-                    <button type="button" onclick="increaseQuantity(this)">+</button>
-                </div>
-
                 <label for="special_request">Special Request</label>
                 <textarea name="special_request" rows="3" placeholder="Enter special requests here..."></textarea>
-
-                <button type="submit">Add to Cart</button>
+                
+                <div class="form-bottom-row">
+                    <div class="quantity-stepper">
+                        <button type="button" onclick="decreaseQuantity(this)">-</button>
+                        <input type="number" name="quantity" value="1" min="1" step="1">
+                        <button type="button" onclick="increaseQuantity(this)">+</button>
+                    </div>
+                    <div class="add-to-cart">
+                    <button type="submit">Add to Cart</button>
+                    </div>
+                </div>
+        
             </form>
         </div>
         {% endfor %}
@@ -176,26 +300,33 @@
             }
         }
 
+        
+
         // Update cart count
         function updateCartCount() {
             fetch('/get-cart-count/')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('cart-count').textContent = data.count;
+                    const count = data.count;
+
+                    // For cart badge under banner
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) {
+                        if (count > 0) {
+                            badge.textContent = count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+
+                    // For other cart count display
+                    const countEl = document.getElementById('cart-count');
+                    if (countEl) {
+                        countEl.textContent = count;
+                    }
                 });
         }
-
-        // Show notification when item is added to cart
-        const form = document.querySelectorAll('.form-container form');
-        form.forEach(f => {
-            f.addEventListener('submit', function(event) {
-                event.preventDefault();
-                // Add to cart logic here
-                showCartNotification();
-                updateCartCount();
-                this.submit();
-            });
-        });
 
         // Initialize cart count on page load
         updateCartCount();
