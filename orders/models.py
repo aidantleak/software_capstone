@@ -38,7 +38,7 @@ class Meal(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    meal = models.ForeignKey('Meal', on_delete=models.CASCADE)
+    meal = models.ForeignKey('Meal', on_delete=models.CASCADE, null=True, blank=True)
     special_request = models.TextField(null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     side = models.CharField(max_length=50, choices=[
