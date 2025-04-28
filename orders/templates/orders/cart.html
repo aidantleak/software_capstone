@@ -22,29 +22,41 @@
                 </div>
             </div>
         {% endfor %}
+        <div style="text-align: right; margin-top: 20px;">
+            <h2 id="order-total">
+                Total: ${{ total|floatformat:2 }}
+            </h2>
+            <h3> {{ total_quantity }} Meal Swipe{% if total_quantity > 1 %}s{% endif %}</h3>
+        </div>
+        <div style="text-align: right;">
+            <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
+                {% csrf_token %}
+                <label for="payment_method"><strong>Payment Method:</strong></label><br>
+                <select name="payment_method" required style="margin-bottom: 15px;">
+                    <option value="">-- Select --</option>
+                    <option value="meal_swipe">Meal Swipe</option>
+                    <option value="flex_dollars">Flex Dollars</option>
+                </select><br>
 
-        <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
-            {% csrf_token %}
-            <label for="payment_method"><strong>Payment Method:</strong></label><br>
-            <select name="payment_method" required style="margin-bottom: 15px;">
-                <option value="">-- Select --</option>
-                <option value="meal_swipe">Meal Swipe</option>
-                <option value="flex_dollars">Flex Dollars</option>
-            </select><br>
+                <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
+                <select name="delivery_method" required style="margin-bottom: 15px;">
+                    <option value="">-- Select --</option>
+                    <option value="pickup">Pickup</option>
+                    <option value="dorm">Dorm Delivery</option>
+                </select><br>
 
-            <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
-            <select name="delivery_method" required style="margin-bottom: 15px;">
-                <option value="">-- Select --</option>
-                <option value="pickup">Pickup</option>
-                <option value="dorm">Dorm Delivery</option>
-            </select><br>
-
-            <label for="dorm"><strong>Dorm Location (if delivery):</strong></label><br>
-            <input type="text" name="dorm" placeholder="Enter dorm room..." style="width: 100%; margin-bottom: 15px;"><br>
-
-            <button type="submit" class="button">Place Order</button>
-        </form>
-    {% else %}
+                <label for="dorm"><strong>Dorm Location (if delivery):</strong></label><br>
+                <input 
+                    type="text" 
+                    name="dorm" 
+                    placeholder="Enter dorm complex and building"
+                    value="{{ user.userprofile.dorm_location|default:'' }}"
+                    style="width: 30%; margin-bottom: 15px;"
+                ><br>
+                <button type="submit" class="button">Place Order</button>
+            </form>
+        </div>
+        {% else %}
         <p style="text-align: center;">Your cart is empty.</p>
         <div style="text-align: center; margin-top: 20px;">
             <a href="{% url 'menu' %}" class="button">Back to Menu</a>

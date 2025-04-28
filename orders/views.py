@@ -17,7 +17,11 @@ def home(request):
 @login_required
 def view_cart(request):
     cart = request.session.get('cart', [])
-    return render(request, 'orders/cart.html', {'cart': cart})
+    total = sum(item['price'] * item['quantity'] for item in cart)
+    total_quantity = sum(item['quantity'] for item in cart)
+    return render(request, 'orders/cart.html', {'cart': cart, 
+                                                'total': total, 
+                                                'total_quantity' : total_quantity})
 
 def menu(request):
     meals = Meal.objects.all()
@@ -56,16 +60,14 @@ def place_order(request):
 
     user_profile = request.user.userprofile
     total_cost = sum(Decimal(item['price']) * item['quantity'] for item in cart)
+    total_quantity = sum(item['quantity'] for item in cart)
     swipe_eligible = any(Meal.objects.get(id=item['meal_id']).mealSwipe for item in cart)
 
     if payment_method == 'meal_swipe':
-        if not swipe_eligible:
-            messages.error(request, "No items in your cart are eligible for meal swipe.")
+        if user_profile.meal_swipes < total_quantity:
+            messages.error(request, f"You only have {user_profile.meal_swipes} meal swipes left, but you are ordering {total_quantity} items.")
             return redirect('view_cart')
-        if user_profile.meal_swipes < 1:
-            messages.error(request, "You do not have enough meal swipes.")
-            return redirect('view_cart')
-        user_profile.meal_swipes -= 1
+        user_profile.meal_swipes -= total_quantity
 
     elif payment_method == 'flex_dollars':
         if user_profile.flex_dollars < total_cost:
