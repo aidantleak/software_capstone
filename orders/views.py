@@ -11,6 +11,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import PasswordResetForm
+from django.shortcuts import get_object_or_404, redirect
+
+
 
 from .models import Meal, Order, OrderItem, UserProfile
 from .forms import CustomUserCreationForm
@@ -290,3 +293,71 @@ def password_reset(request):
         form = PasswordResetForm()
 
     return render(request, 'registration/password_reset.html', {'form': form})
+
+def remove_from_cart(request, meal_id):
+    cart = request.session.get('cart', [])
+    cart = [item for item in cart if item['meal_id'] != meal_id]
+    request.session['cart'] = cart
+    messages.success(request, 'Item removed from cart.')
+    return redirect('view_cart')
+
+def edit_cart(request, meal_id):
+    cart = request.session.get('cart', [])
+    for item in cart:
+        if item['meal_id'] == meal_id:
+            item['quantity'] = int(request.POST.get('quantity', item['quantity']))
+            item['side'] = request.POST.get('side', item['side'])
+    request.session['cart'] = cart
+    messages.success(request, 'Cart updated successfully.')
+    return redirect('view_cart')
+
+@login_required
+def update_cart_quantity(request, meal_id):
+    if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Debugging: Log the incoming data
+        print(f"POST Data: {request.POST}")
+        
+        # Get the updated quantity from the POST request
+        quantity = int(request.POST.get("quantity", 1))
+        
+        # Retrieve the cart from the session
+        cart = request.session.get("cart", [])
+        
+        # Debugging: Log the current state of the cart
+        print(f"Cart before update: {cart}")
+        
+        # Find the item in the cart and update its quantity
+        for item in cart:
+            if item["meal_id"] == meal_id:
+                if quantity > 0:
+                    item["quantity"] = quantity
+                else:
+                    cart.remove(item)  # Remove item if quantity is set to 0
+                break
+        
+        # Debugging: Log the updated state of the cart
+        print(f"Cart after update: {cart}")
+        
+        # Save the updated cart back to the session
+        request.session["cart"] = cart
+        
+        # Return a success response
+        return JsonResponse({"success": True, "message": "Quantity updated successfully!"})
+    
+    # For non-AJAX requests, redirect to cart page
+    return redirect('view_cart')
+
+def update_special_request(request, meal_id):
+    cart = request.session.get('cart', [])
+    new_special_request = request.POST.get('special_request', '')
+
+    for item in cart:
+        if item['meal_id'] == meal_id:
+            item['special_request'] = new_special_request
+            break
+
+    request.session['cart'] = cart
+    messages.success(request, 'Special request updated successfully.')
+    return redirect('view_cart')
+
+from django.shortcuts import render

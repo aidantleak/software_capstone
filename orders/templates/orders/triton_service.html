@@ -15,6 +15,7 @@
             <option value="on_the_way" {% if request.GET.status == 'on_the_way' %}selected{% endif %}>On the Way</option>
             <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Delivered</option>
             <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Canceled</option>
+            
         </select>
         <select name="delivery_method" style="padding: 5px;">
             <option value="">All Methods</option>

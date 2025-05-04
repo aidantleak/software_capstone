@@ -10,9 +10,10 @@
 <div class="container">
     <p id="status-message">🎉 Thank you for your order!</p>
     <p><strong>Order ID:</strong> {{ order.id }}</p>
-    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
-    <p><strong>Delivery Method:</strong> {{ order.get_delivery_method_display }}</p>
-    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+    <p><strong>Payment Method:</strong> {{order.payment_method}}</p>
+    <p><strong>Delivery Method:</strong> {{order.delivery_method}}</p>
+    <p><strong>Status:</strong> {{ order.status}}</p>
+    <p><strong>Dorm Location:</strong> {{ order.dorm_location|default:"N/A" }}</p>
     {% if order.delivery_method == 'dorm' %}
         <p><strong>Dorm Location:</strong> {{ order.dorm_location }}</p>
     {% endif %}
@@ -23,7 +24,7 @@
     </div>
 
     <a href="{% url 'menu' %}" class="button">Return to Menu</a>
-    <a href="{% url 'home' %}" class="button">Back to Home</a>
+    <a href="{% url 'account' %}" class="button">View my account</a>
 </div>
 
 <script>

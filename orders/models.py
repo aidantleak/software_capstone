@@ -62,7 +62,7 @@ class Order(models.Model):
     payment_method = models.CharField(
         max_length=20,
         choices=[
-            ('meal_swipe', 'Meal Swipe'),
+            ('meal_swipee' , 'Meal Swipe'),
             ('flex_dollars', 'Flex Dollars'),
             ('pay_at_store', 'Pay At Store')
         ],
@@ -79,16 +79,20 @@ class Order(models.Model):
         null=True,
         blank=True
     )
+
     dorm_location = models.CharField(max_length=100, null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     favorite = models.BooleanField(default=False)
 
+    def formatted_delivery_method(self):
+        return self.delivery_method.replace("_", " ").title()
+
     def __str__(self):
         return f"Order {self.id} by {self.user.username if self.user else 'Guest'}"
 
-    def get_payment_method_display(self):
+    def formatted_payment_method(self):
         return self.payment_method.replace("_", " ").title()
 
 class OrderItem(models.Model):
@@ -110,4 +114,3 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
-

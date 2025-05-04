@@ -105,3 +105,4 @@ EMAIL_HOST_USER = 'pub.order25@gmail.com'
 EMAIL_HOST_PASSWORD = 'TRITONpub'
 DEFAULT_FROM_EMAIL = 'pub.order25@gmail.com'
 ADMIN_EMAIL = 'leakaidan@gmail.com'
+APPEND_SLASH = False

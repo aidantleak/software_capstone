@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from . import views
 from .views import password_reset
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('', views.home, name='root'),
@@ -29,8 +30,14 @@ urlpatterns = [
     path('account/', views.account, name='account'),
     path('edit-account/', views.edit_account, name='edit_account'),
     
+    
     # Cart Count
     path('get-cart-count/', views.get_cart_count, name='get_cart_count'),
+    path('cart/remove/<int:meal_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('cart/update/<int:meal_id>/', views.update_cart_quantity, name='update_cart_quantity'),
+    path('cart/update_special_request/<int:meal_id>/', views.update_special_request, name='update_special_request'),
+    
+
 
     # Triton Service
     path('triton-service/', views.triton_service, name='triton_service'),
