@@ -210,8 +210,33 @@ def is_admin(user):
 
 @user_passes_test(is_admin)
 def triton_service(request):
-    orders = Order.objects.all().order_by('-created_at')
-    return render(request, 'orders/triton_service.html', {'orders': orders})
+    orders = Order.objects.all()
+    dorm = request.GET.get('dorm', '').strip()
+    status = request.GET.get('status', '').strip()
+    delivery_method = request.GET.get('delivery_method', '').strip()
+    ordering = request.GET.get('ordering', '-created_at')  # Default to most recent orders
+
+    if dorm:
+        orders = orders.filter(dorm_location__icontains=dorm)
+    if status:
+        orders = orders.filter(status__iexact=status)
+    if delivery_method:
+        orders = orders.filter(delivery_method=delivery_method)
+
+    # Apply ordering
+    orders = orders.order_by(ordering)
+
+    context = {
+        'orders': orders,
+        'STATUS_DISPLAY': {
+            'pending': 'Pending',
+            'ready_for_pickup': 'Ready for Pickup',
+            'on_the_way': 'On the Way',
+            'delivered': 'Delivered',
+            'canceled': 'Canceled',
+        }
+    }
+    return render(request, 'orders/triton_service.html', context)
 
 @user_passes_test(is_admin)
 def update_order_status(request, order_id):
