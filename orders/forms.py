@@ -18,8 +18,7 @@ class CustomUserCreationForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
-            phone_number = self.cleaned_data['phone_number']
-            UserProfile.objects.create(user=user, phone_number=phone_number)
+        
         return user
 
 class OrderForm(forms.ModelForm):

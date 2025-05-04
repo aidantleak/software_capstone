@@ -196,6 +196,8 @@ def register(request):
             user = form.save()
             login(request, user)
             return redirect('menu')
+        else:
+            messages.error(request, "Registration failed. Please try again.")
     else:
         form = CustomUserCreationForm()
     return render(request, 'orders/register.html', {'form': form})
