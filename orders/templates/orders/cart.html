@@ -28,6 +28,7 @@
             <button type="submit">Update</button>
         </form>
     </div>
+
     <p>Price: ${{ item.price }}</p>
 </div>
 {% endfor %}
@@ -63,7 +64,7 @@
             <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
                 {% csrf_token %}
                 <label for="payment_method"><strong>Payment Method:</strong></label><br>
-                <select name="payment_method" required style="margin-bottom: 15px;">
+                <select id="payment_method" name="payment_method"  required style="margin-bottom: 15px;">
                     <option value="">-- Select --</option>
                     <option value="meal_swipe">Meal Swipe</option>
                     <option value="flex_dollars">Flex Dollars</option>
@@ -71,22 +72,24 @@
                 </select><br>
 
                 <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
-                <select name="delivery_method" required style="margin-bottom: 15px;">
+                <select name="delivery_method" required  style="margin-bottom: 15px;">
                     <option value="">-- Select --</option>
                     <option value="pickup">Pickup</option>
                     <option value="dorm">Dorm Delivery</option>
                 </select><br>
 
                 <label for="dorm"><strong>Dorm Location (if delivery):</strong></label><br>
+                
 <select 
     name="dorm" 
-    required 
+    required
     style="width: 30%; margin-bottom: 15px;"
 >
     <option value="">-- Select Dorm --</option>
     <option value="Epsilon">Epsilon</option>
     <option value="Delta">Delta</option>
-    <option value="Sigma and West Lodge">Sigma and West Lodge</option>
+    <option value="Sigma">Sigma</option>
+    <option value="West Lodge">West Lodge</option>
     <option value="Omega">Omega</option>
     <option value="Kappa">Kappa</option>
     <option value="Alpha">Alpha</option>
@@ -94,6 +97,11 @@
     <option value="Iota">Iota</option>
     <option value="Pub">Pub</option>
 </select><br>
+<!-- Phone Number Field -->
+<div style="margin-top: 20px;">
+    <label for="phone_number"><strong>Phone Number for Delivery:</strong></label><br>
+    <input type="text" id="phone_number" reuired name="phone_number" placeholder="Enter your phone number" style="width: 30%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;">
+</div>
 <button type="submit" class="button">Place Order</button>
             </form>
             <div style="margin-top: 10px;">
@@ -108,6 +116,7 @@
     {% endif %}
 </div>
 {% endblock %}
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -125,4 +134,5 @@
             }
         });
     });
+   
     </script>
