@@ -1,6 +1,7 @@
 from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from . import views
+from .views import password_reset
 
 urlpatterns = [
     path('', views.home, name='root'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('accounts/logout/', LogoutView.as_view(), name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('password-reset/', password_reset, name='password_reset'),
 
     # Account Pages
     path('account/', views.account, name='account'),
@@ -33,4 +35,5 @@ urlpatterns = [
     # Triton Service
     path('triton-service/', views.triton_service, name='triton_service'),
     path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    
 ]

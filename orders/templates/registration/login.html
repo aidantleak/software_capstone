@@ -16,5 +16,9 @@
         <button type="submit" class="button">Login</button>
         <a href="{% url 'register' %}" class="button" style="margin-top: 10px; display: inline-block;">Back to Registration</a>
     </form>
+    <div style="margin-top: 10px;">
+        <a href="{% url 'password_reset' %}" class="button">Forgot Password?</a>
+    </div>
 </div>
+
 {% endblock %}

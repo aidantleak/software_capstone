@@ -7,6 +7,10 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from decimal import Decimal
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import PasswordResetForm
 
 from .models import Meal, Order, OrderItem, UserProfile
 from .forms import CustomUserCreationForm
@@ -43,6 +47,7 @@ def add_to_cart(request, meal_id):
         'quantity': quantity,
         'special_request': special_request,
         'image': meal.image.url if meal.image else None,
+        'meal_swipe': meal.mealSwipe 
     })
     request.session['cart'] = cart
     messages.success(request, f'{meal.name} has been added to your cart!')
@@ -255,3 +260,23 @@ def update_order_status(request, order_id):
             order.save()
             messages.success(request, f"Order {order.id} updated to '{new_status}'")
     return redirect('triton_service')
+
+def password_reset(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            new_password = form.cleaned_data.get('new_password')
+
+            try:
+                user = User.objects.get(username=username)
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, "Password has been reset successfully. You can now log in with your new password.")
+                return redirect('login')
+            except User.DoesNotExist:
+                messages.error(request, "User not found.")
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'registration/password_reset.html', {'form': form})
