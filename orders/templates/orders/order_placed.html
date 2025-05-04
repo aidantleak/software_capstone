@@ -12,6 +12,7 @@
     <p><strong>Order ID:</strong> {{ order.id }}</p>
     <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
     <p><strong>Delivery Method:</strong> {{ order.get_delivery_method_display }}</p>
+    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
     {% if order.delivery_method == 'dorm' %}
         <p><strong>Dorm Location:</strong> {{ order.dorm_location }}</p>
     {% endif %}

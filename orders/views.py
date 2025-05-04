@@ -79,6 +79,14 @@ def place_order(request):
             messages.error(request, "You do not have enough flex dollars.")
             return redirect('view_cart')
         user_profile.flex_dollars -= total_cost
+    
+    elif payment_method == 'pay_at_store':
+        delivery_method= "Pickup"
+        # No deduction needed for Pay at the Store
+        pass
+    else:
+       messages.error(request, "Invalid payment method selected.")
+       return redirect('view_cart')
 
     user_profile.dorm_location = dorm_input
     user_profile.save()

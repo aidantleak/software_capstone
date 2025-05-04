@@ -36,6 +36,7 @@
                     <option value="">-- Select --</option>
                     <option value="meal_swipe">Meal Swipe</option>
                     <option value="flex_dollars">Flex Dollars</option>
+                    <option value="pay_at_store">Pay at the Store</option>
                 </select><br>
 
                 <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
@@ -60,6 +61,7 @@
     <option value="Alpha">Alpha</option>
     <option value="Gamma">Gamma</option>
     <option value="Iota">Iota</option>
+    <option value="Pub">Pub</option>
 </select><br>
 <button type="submit" class="button">Place Order</button>
             </form>
@@ -72,3 +74,21 @@
     {% endif %}
 </div>
 {% endblock %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const paymentMethodDropdown = document.getElementById("payment_method");
+        const deliveryOptions = document.getElementById("delivery_options");
+    
+        paymentMethodDropdown.addEventListener("change", function() {
+            const paymentMethod = this.value;
+    
+            // Hide delivery options if "Pay at Store" is selected
+            if (paymentMethod === "pay_at_store") {
+                deliveryOptions.style.display = "none";
+            } else {
+                deliveryOptions.style.display = "block";
+            }
+        });
+    });
+    </script>

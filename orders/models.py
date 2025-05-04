@@ -64,6 +64,7 @@ class Order(models.Model):
         choices=[
             ('meal_swipe', 'Meal Swipe'),
             ('flex_dollars', 'Flex Dollars'),
+            ('pay_at_store', 'Pay At Store')
         ],
         null=True,
         blank=True
@@ -73,6 +74,7 @@ class Order(models.Model):
         choices=[
             ('pickup', 'Pickup'),
             ('dorm', 'Dorm'),
+            (' ', 'PickUp')
         ],
         null=True,
         blank=True
@@ -85,6 +87,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username if self.user else 'Guest'}"
+
+    def get_payment_method_display(self):
+        return self.payment_method.replace("_", " ").title()
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
