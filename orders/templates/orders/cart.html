@@ -2,167 +2,190 @@
 {% load static %}
 
 {% block content %}
-<div class="banner">
-    <h1 style="text-align: center;">Your Cart</h1>
+<div class="banner" style="background-color: teal; color: white; margin: 10; padding: 50px;">
+  <h1 style="text-align: center;">Your Cart</h1>
 </div>
 
-<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-    {% if cart %}
-        {% for item in cart %}
-            <div style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; background: white;">
-                {% if item.image %}
-                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width: 120px; height: 120px; object-fit: cover;">
-                {% endif %}
-                <div style="padding: 15px; flex-grow: 1;">
-                    <h3>{{ item.name }}</h3>
-                    <p>Side: {{ item.side }}</p>
-                    {% if cart %}
-    
-                    {% for item in cart %}
-                        <div class="cart-item">
-                            <p><strong>{{ item.name }}</strong></p>
-                            <p>Side: {{ item.side }}</p>
-                            <div class="quantity-controls">
-                                <form method="POST" action="{% url 'update_cart_quantity' item.meal_id %}">
-                                    {% csrf_token %}
-                                    <label for="quantity-{{ item.meal_id }}">Quantity:</label>
-                                    <input type="number" id="quantity-{{ item.meal_id }}" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px;">
-                                    <button type="submit">Update</button>
-                                </form>
-                            </div>
-                            <p>Price: ${{ item.price }}</p>
-                        </div>
-                    {% empty %}
-                        <p style="text-align: center;">Your cart is empty.</p>
-                        <div style="text-align: center; margin-top: 20px;">
-                            <a href="{% url 'menu' %}" class="button">Back to Menu</a>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+<div class="meal-card" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+  {% if cart %}
+    {% for item in cart %}
+      <div
+        style="
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          overflow: hidden;
+          background: white;
+          padding: 24px 0 0 24px;
+        "
+      >
+      {% if item.image %}
+          <img
+            src="{{ item.image }}"
+            alt="{{ item.name }}"
+            style="
+              width: 240px;
+              height: 210px;
+              object-fit: cover;
+              margin-right: 24px;
+              align-self: flex-start;
+            "
+          >
+          
+        {% endif %}
+        <div style="flex-grow: 1;">
+          <h3>{{ item.name }}</h3>
+          <p> Side: {{ item.side }}</p>
+          <!-- Quantity Update Form -->
+          <form
+            method="POST"
+            action="{% url 'update_cart_quantity' item.meal_id %}"
+            style="margin-bottom: 10px;"
+          >
+            {% csrf_token %}
+            <label for="quantity-{{ item.meal_id }}">Quantity:</label>
+            <input
+              type="number"
+              id="quantity-{{ item.meal_id }}"
+              name="quantity"
+              value="{{ item.quantity }}"
+              min="1"
+              style="width: 60px;"
+            >
+            <button type="submit">Save</button>
+          </form>
 
+          <!-- Special request -->
+          <form
+            method="POST"
+            action="{% url 'update_special_request' item.meal_id %}"
+            style="margin-bottom: 10px;"
+          >
+            {% csrf_token %}
+            <label for="special_request_{{ item.meal_id }}">Special Request:</label><br>
+            
+            <textarea
+              name="special_request"
+              id="special_request_{{ item.meal_id }}"
+              style="width: 100%; max-width: 300px;"
+            >{{ item.special_request }}</textarea><br>
+            <button type="submit">Save</button>
+          </form>
 
+          <p><strong>Price:</strong> ${{ item.price|floatformat:2 }}</p>
 
-
-                    <div class="special-request-controls">
-                        <form method="POST" action="{% url 'update_special_request' item.meal_id %}">
-                            {% csrf_token %}
-                            <label for="special_request_{{ item.meal_id }}">Special Request:</label>
-                            <textarea 
-                                name="special_request" 
-                                id="special_request_{{ item.meal_id }}"  
-                                style="width: 25%;"
-                            >{{ item.special_request }}</textarea>
-                            <button type="submit" class="button">Update Special Request</button>
-                        </form>
-                    </div>
-                    <p><strong>Price:</strong> ${{ item.price|floatformat:2 }}</p>
-                    <form method="POST" action="{% url 'remove_from_cart' item.meal_id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="button">Remove</button>
-                    </form>
-                    
-                </div>
-            </div>
-        {% endfor %}
-        <div style="text-align: right; margin-top: 20px;">
-            <h2 id="order-total">
-                Total: ${{ total|floatformat:2 }}
-            </h2>
-            <h3> {{ total_quantity }} Meal Swipe{% if total_quantity > 1 %}s{% endif %}</h3>
+          <!-- Remove from Cart -->
+          <form method="POST" action="{% url 'remove_from_cart' item.meal_id %}">
+            {% csrf_token %}
+            <button type="submit" class="button" style="background-color: #e53e3e; padding: 4px 8px; font-size: 16px;" >Remove Item</button>
+          </form>
         </div>
-        <div style="text-align: right;">
-            <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
-                {% csrf_token %}
-                <label for="payment_method"><strong>Payment Method:</strong></label><br>
-                <select id="payment_method" name="payment_method"  required style="margin-bottom: 15px;">
-                    <option value="">-- Select --</option>
-                    <option value="meal_swipe">Meal Swipe</option>
-                    <option value="flex_dollars">Flex Dollars</option>
-                    <option value="pay_at_store">Pay at the Store</option>
-                </select><br>
+      </div>
+    {% endfor %}
 
-                <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
-                <select name="delivery_method" required  style="margin-bottom: 15px;">
-                    <option value="">-- Select --</option>
-                    <option value="pickup">Pickup</option>
-                    <option value="dorm">Dorm Delivery</option>
-                </select><br>
+    <!-- Totals -->
+    <div style="text-align: right; margin-top: 20px;">
+      <h2 id="order-total">Total: ${{ total|floatformat:2 }}</h2>
+      <h3>{{ total_quantity }} Meal Swipe{% if total_quantity > 1 %}s{% endif %}</h3>
+    </div>
 
-                <label for="dorm"><strong>Dorm Location (if delivery):</strong></label><br>
-                
-<select 
-    name="dorm" 
-    required
-    style="width: 30%; margin-bottom: 15px;"
->
-    <option value="">-- Select Dorm --</option>
-    <option value="Epsilon">Epsilon</option>
-    <option value="Delta">Delta</option>
-    <option value="Sigma">Sigma</option>
-    <option value="West Lodge">West Lodge</option>
-    <option value="Omega">Omega</option>
-    <option value="Kappa">Kappa</option>
-    <option value="Alpha">Alpha</option>
-    <option value="Gamma">Gamma</option>
-    <option value="Iota">Iota</option>
-    <option value="Pub">Pub</option>
-</select><br>
-<!-- Phone Number Field -->
-<div style="margin-top: 20px;">
-    <label for="phone_number"><strong>Phone Number for Delivery:</strong></label><br>
-    <input type="text" id="phone_number" required name="phone_number" placeholder="Enter your phone number" style="width: 30%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;">
+    <!-- Checkout Form -->
+    <div style="text-align: right;">
+      <form method="POST" action="{% url 'place_order' %}" style="margin-top: 30px;">
+        {% csrf_token %}
+
+        <label for="payment_method"><strong>Payment Method:</strong></label><br>
+        <select
+          id="payment_method"
+          name="payment_method"
+          required
+          style="margin-bottom: 15px; padding: 5px;"
+        >
+          <option value="">-- Select --</option>
+          <option value="meal_swipe">Meal Swipe</option>
+          <option value="flex_dollars">Flex Dollars</option>
+          <option value="pay_at_store">Pay at the Store</option>
+        </select><br>
+
+        <label for="delivery_method"><strong>Delivery Method:</strong></label><br>
+        <select
+          id="delivery_method"
+          name="delivery_method"
+          required
+          style="margin-bottom: 15px; padding: 5px;"
+        >
+          <option value="">-- Select --</option>
+          <option value="pickup">Pickup</option>
+          <option value="dorm">Dorm Delivery</option>
+        </select><br>
+
+        <!-- Dorm and Pjone will be hidden until Delivery is chosen -->
+        <div id="dorm-fields" style="display: none; margin-top: 5px;">
+          <label for="dorm" style = "display: block; margin-bottom: 5px;"><strong>Dorm Location :</strong></label><br>
+          <select
+            id="dorm"
+            name="dorm"
+            style="width: 30%; padding: 5px; margin-bottom: 15px;"
+            required
+          >
+            <option value="">-- Select Dorm --</option>
+            {% for dorm in dorm_choices %}
+                <option
+                value="{{ dorm }}"
+                {% if user.userprofile.dorm_location == dorm %}selected{% endif %}
+                >
+                {{ dorm }}
+                </option>
+            {% endfor %}
+            </select>
+
+          <label for="phone_number" style = "display: block;" ><strong>Phone Number:</strong></label><br>
+          <input
+            type="text"
+            id="phone_number"
+            name="phone_number"
+            placeholder="Enter your phone number"
+            value="{{ user.userprofile.phone_number }}"
+            style="width: 30%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;"
+          >
+        </div>
+
+        <button type="submit" class="button" style="margin-top: 15px;">
+          Place Order
+        </button>
+      </form>
+
+      <div style="margin-top: 10px;">
+        <a href="{% url 'menu' %}" class="button">Continue Shopping</a>
+      </div>
+    </div>
+  {% else %}
+    <p style="text-align: center;">Your cart is empty.</p>
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="{% url 'menu' %}" class="button">Back to Menu</a>
+    </div>
+  {% endif %}
 </div>
-<button type="submit" class="button">Place Order</button>
-            </form>
-            <div style="margin-top: 10px;">
-                <a href="{% url 'menu' %}" class="button">Continue Shopping</a>
-            </div>
-        </div>
-        {% else %}
-        <p style="text-align: center;">Your cart is empty.</p>
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="{% url 'menu' %}" class="button">Back to Menu</a>
-        </div>
-    {% endif %}
-</div>
-{% endblock %}
-
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const paymentMethodDropdown = document.getElementById("payment_method");
-        const deliveryOptions = document.getElementById("delivery_options");
-    
-        paymentMethodDropdown.addEventListener("change", function() {
-            const paymentMethod = this.value;
-    
-            // Hide delivery options if "Pay at Store" is selected
-            if (paymentMethod === "pay_at_store") {
-                deliveryOptions.style.display = "none";
-            } else {
-                deliveryOptions.style.display = "block";
-            }
-        });
+  document.addEventListener('DOMContentLoaded', function() {
+    const deliverySelect = document.getElementById('delivery_method');
+    const dormFields = document.getElementById('dorm-fields');
+
+    deliverySelect.addEventListener('change', function() {
+      if (this.value === 'dorm') {
+        dormFields.style.display = 'block';
+        document.getElementById('dorm').required = true;
+        document.getElementById('phone_number').required = true;
+      } else {
+        dormFields.style.display = 'none';
+        document.getElementById('dorm').required = false;
+        document.getElementById('phone_number').required = false;
+      }
     });
-   
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const paymentMethodDropdown = document.getElementById("payment_method");
-            const deliveryOptions = document.querySelector("[name='delivery_method']"); // Corrected reference to match existing element
-    
-            paymentMethodDropdown.addEventListener("change", function() {
-                const paymentMethod = this.value;
-    
-                // Hide delivery options if "Pay at Store" is selected
-                if (paymentMethod === "pay_at_store") {
-                    deliveryOptions.closest("div").style.display = "none"; // Hide parent container
-                } else {
-                    deliveryOptions.closest("div").style.display = "block"; // Show parent container
-                }
-            });
-        });
-    </script>
-    
-    <!-- Fix 'required' attribute typo -->
-    
+  });
+</script>
+{% endblock %}
+

@@ -12,6 +12,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import PasswordResetForm
 from django.shortcuts import get_object_or_404, redirect
+from django.core.paginator import Paginator
+
 
 
 
@@ -26,9 +28,15 @@ def view_cart(request):
     cart = request.session.get('cart', [])
     total = sum(item['price'] * item['quantity'] for item in cart)
     total_quantity = sum(item['quantity'] for item in cart)
+    dorm_choices = [
+        "Epsilon", "Delta", "Sigma", "West Lodge", "Omega",
+        "Kappa", "Alpha", "Gamma", "Iota", "Pub"
+    ]
+
     return render(request, 'orders/cart.html', {'cart': cart, 
                                                 'total': total, 
-                                                'total_quantity' : total_quantity})
+                                                'total_quantity' : total_quantity,
+                                                'dorm_choices': dorm_choices})
 
 def menu(request):
     meals = Meal.objects.all()
@@ -228,32 +236,47 @@ def is_admin(user):
 
 @user_passes_test(is_admin)
 def triton_service(request):
-    orders = Order.objects.all()
-    dorm = request.GET.get('dorm', '').strip()
-    status = request.GET.get('status', '').strip()
+    qs = (Order.objects
+              .select_related('user')
+              .prefetch_related('orderitem_set__meal'))
+    
+    STATUS_CHOICES = [
+    ('pending',          'Pending'),
+    ('ready_for_pickup', 'Ready for Pickup'),
+    ('on_the_way',       'On the Way'),
+    ('completed',        'Completed'),
+    ('canceled',         'Canceled'),]
+
+    # filters
+    dorm            = request.GET.get('dorm', '').strip()
+    status_filter   = request.GET.get('status', '').strip()
     delivery_method = request.GET.get('delivery_method', '').strip()
-    ordering = request.GET.get('ordering', '-created_at')  # Default to most recent orders
+    ordering        = request.GET.get('ordering', '-created_at')
 
     if dorm:
-        orders = orders.filter(dorm_location__icontains=dorm)
-    if status:
-        orders = orders.filter(status__iexact=status)
+        qs = qs.filter(dorm_location__icontains=dorm)
+    if status_filter:
+        qs = qs.filter(status__iexact=status_filter)
     if delivery_method:
-        orders = orders.filter(delivery_method=delivery_method)
+        qs = qs.filter(delivery_method=delivery_method)
 
-    # Apply ordering
-    orders = orders.order_by(ordering)
+    qs = qs.order_by(ordering)
+
+    paginator   = Paginator(qs, 25)
+    page_number = request.GET.get('page', 1)
+    page_obj    = paginator.get_page(page_number)
 
     context = {
-        'orders': orders,
-        'STATUS_DISPLAY': {
-            'pending': 'Pending',
-            'ready_for_pickup': 'Ready for Pickup',
-            'on_the_way': 'On the Way',
-            'delivered': 'Delivered',
-            'canceled': 'Canceled',
-        }
+        'orders': page_obj, 
+        'status_choices': STATUS_CHOICES,
+        'current_filters': {
+            'dorm':            dorm,
+            'status':          status_filter,
+            'delivery_method': delivery_method,
+            'ordering':        ordering,
+        },
     }
+
     return render(request, 'orders/triton_service.html', context)
 
 @user_passes_test(is_admin)

@@ -8,15 +8,16 @@
     <!-- Filter Controls -->
     <form method="get" style="margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
         <input type="text" name="dorm" placeholder="Filter by Dorm" value="{{ request.GET.dorm }}" style="padding: 5px;">
-        <select name="status" style="padding: 5px;">
+        <select name="status">
             <option value="">All Statuses</option>
-            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending{{ STATUS_DISPLAY.in_progress }}</option>
-            <option value="ready_for_pickup" {% if request.GET.status == 'ready_for_pickup' %}selected{% endif %}>Ready for Pickup</option>
-            <option value="on_the_way" {% if request.GET.status == 'on_the_way' %}selected{% endif %}>On the Way</option>
-            <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Delivered</option>
-            <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Canceled</option>
-            
-        </select>
+            {% for value,label in status_choices %}
+                <option value="{{ value }}"
+                {% if request.GET.status == value or order.status == value %}selected{% endif %}>
+                {{ label }}
+                </option>
+            {% endfor %}
+            </select>
+
         <select name="delivery_method" style="padding: 5px;">
             <option value="">All Methods</option>
             <option value="pickup" {% if request.GET.delivery_method == 'pickup' %}selected{% endif %}>Pickup</option>
@@ -26,13 +27,35 @@
         <a href="{% url 'triton_service' %}" class="button" type="submit">Clear Filters</a>
     </form>
 
-    <table style="width: 100%; border-collapse: collapse;">
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 8px 12px;
+    border-right: 1px solid #ddd;    /* vertical separators */
+  }
+  th:last-child, td:last-child {
+    border-right: none;
+  }
+  tr {
+    border-bottom: 1px solid #ddd;
+  }
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+</style>
+
+    <table style="width: 100%; border-collapse: collapse; ">
+    
         <thead>
             <tr style="background-color: #0b1a3d; color: white;">
-                <th style="padding: 10px;">Order ID</th>
+                <th style="padding: 20px;">Order ID</th>
                 <th>User</th>
                 <th>Dorm</th>
                 <th>Phone</th>
+                <th>Date/Time</th> 
                 <th>Details</th>
                 <th>Payment</th>
                 <th>Status</th>
@@ -61,9 +84,9 @@
                         border-radius: 6px;
                         color: white;
                         font-weight: bold;
-                        {% if order.status == 'in_progress' %} background-color: orange;
+                        {% if order.status == 'pending' %} background-color: orange;
                         {% elif order.status == 'ready_for_pickup' %} background-color: green;
-                        {% elif order.status == 'delivered' %} background-color: green;
+                        {% elif order.status == 'completed' %} background-color: green;
                         {% elif order.status == 'on_the_way' %} background-color: steelblue;
                         {% elif order.status == 'canceled' %} background-color: crimson;
                         {% else %} background-color: gray;
@@ -74,15 +97,15 @@
                 <td>
                     <form method="post" action="{% url 'update_order_status' order.id %}">
                         {% csrf_token %}
-                        <select name="status" style="margin-bottom: 5px;">
-                            <option value="in_progress" {% if order.status == "in_progress" %} selected {% endif %}>In Progress</option>
-                            <option value="ready_for_pickup" {% if order.status == "ready_for_pickup" %} selected {% endif %}>Ready for Pickup</option>
-                            {% if order.delivery_method == 'delivery' %}
-                            <option value="on_the_way" {% if order.status == "on_the_way" %} selected {% endif %}>On the Way</option>
-                            <option value="delivered" {% if order.status == "delivered" %} selected {% endif %}>Delivered</option>
-                            {% endif %}
-                            <option value="canceled" {% if order.status == "canceled" %} selected {% endif %}>Canceled</option>
-                        </select><br>
+                        <select name="status">
+                            <option value="">All Statuses</option>
+                            {% for value,label in status_choices %}
+                                <option value="{{ value }}"
+                                {% if request.GET.status == value or order.status == value %}selected{% endif %}>
+                                {{ label }}
+                                </option>
+                            {% endfor %}
+                            </select><br>
                         <button type="submit">Update</button>
                     </form>
                 </td>
@@ -92,5 +115,42 @@
             {% endfor %}
         </tbody>
     </table>
+      </table>
+
+  <!-- pagination controls -->
+  <div class="pagination" style="margin: 20px 0; text-align: center;">
+    {% if orders.has_previous %}
+      <a
+        href="?page={{ orders.previous_page_number }}
+               {% if current_filters.dorm %}&dorm={{ current_filters.dorm }}{% endif %}
+               {% if current_filters.status %}&status={{ current_filters.status }}{% endif %}
+               {% if current_filters.delivery_method %}&delivery_method={{ current_filters.delivery_method }}{% endif %}
+               {% if current_filters.ordering %}&ordering={{ current_filters.ordering }}{% endif %}"
+        class="button"
+        style="margin-right: 8px;"
+      >
+        &laquo; Previous
+      </a>
+    {% endif %}
+
+    <span style="margin: 0 12px;">
+      Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+    </span>
+
+    {% if orders.has_next %}
+      <a
+        href="?page={{ orders.next_page_number }}
+               {% if current_filters.dorm %}&dorm={{ current_filters.dorm }}{% endif %}
+               {% if current_filters.status %}&status={{ current_filters.status }}{% endif %}
+               {% if current_filters.delivery_method %}&delivery_method={{ current_filters.delivery_method }}{% endif %}
+               {% if current_filters.ordering %}&ordering={{ current_filters.ordering }}{% endif %}"
+        class="button"
+        style="margin-left: 8px;"
+      >
+        Next &raquo;
+      </a>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}

@@ -3,6 +3,23 @@
 {% load static %}
 
 {% block content %}
+
+    <style>
+        .progress-bar {
+            margin-top: 30px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            width: 0%;                     
+            background-color: teal;
+            transition: width 0.5s ease-in-out; 
+        }
+    </style>
+
 <div class="banner">
     <h1>Order Placed Successfully!</h1>
 </div>
@@ -12,12 +29,11 @@
     <p><strong>Order ID:</strong> {{ order.id }}</p>
     <p><strong>Payment Method:</strong> {{order.payment_method}}</p>
     <p><strong>Delivery Method:</strong> {{order.delivery_method}}</p>
-    <p><strong>Status:</strong> {{ order.status}}</p>
-    <p><strong>Dorm Location:</strong> {{ order.dorm_location|default:"N/A" }}</p>
     {% if order.delivery_method == 'dorm' %}
         <p><strong>Dorm Location:</strong> {{ order.dorm_location }}</p>
     {% endif %}
     <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number }}</p>
+
 
     <div class="progress-bar">
         <div class="progress-bar-fill" id="progress-bar-fill"></div>
@@ -35,14 +51,19 @@
     function updateProgress(status) {
         if (status === 'pending') {
             progressBar.style.width = '33%';
-            statusMsg.innerText = '🎉 Thank you for your order! Your order is pending. Hang tight!';
-        } else if (status === 'preparing') {
+            statusMsg.innerText = '👨‍🍳 Thank you for your order! Your order is in progress. Hang tight!';
+        } else if (status == 'ready_for_pickup') {
             progressBar.style.width = '66%';
-            statusMsg.innerText = '👨‍🍳 Your order is being prepared!';
-        } else if (status === 'completed') {
+            statusMsg.innerText = '🎉 Your order is ready for pickup!';
+        }else if (status === 'on_the_way') {
+            progressBar.style.width = '66%';
+            statusMsg.innerText = '🎉 Your order is on the way!';
+        } 
+        else if (status === 'completed') {
             progressBar.style.width = '100%';
-            statusMsg.innerText = '✅ Your order is ready!';
-        } else if (status === 'canceled') {
+            statusMsg.innerText = '✅ Your order is complete!';
+        }
+        else if (status === 'canceled') {
             progressBar.style.width = '100%';
             statusMsg.innerText = '❌ Your order was canceled.';
         }

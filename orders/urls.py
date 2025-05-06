@@ -38,11 +38,13 @@ urlpatterns = [
     path('cart/update_special_request/<int:meal_id>/', views.update_special_request, name='update_special_request'),
     path('update_cart_quantity/<int:meal_id>/', views.update_cart_quantity, name='update_cart_quantity'),
     path('update_special_request/<int:meal_id>/', views.update_special_request, name='update_special_request'),
-    
+   
 
 
     # Triton Service
     path('triton-service/', views.triton_service, name='triton_service'),
     path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    
+
     
 ]
