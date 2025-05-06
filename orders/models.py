@@ -59,6 +59,8 @@ class Order(models.Model):
         ],
         default='pending'
     )
+    created_at = models.DateTimeField(auto_now_add=True)  
+    
     payment_method = models.CharField(
         max_length=20,
         choices=[
