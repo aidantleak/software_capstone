@@ -36,6 +36,8 @@ urlpatterns = [
     path('cart/remove/<int:meal_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/<int:meal_id>/', views.update_cart_quantity, name='update_cart_quantity'),
     path('cart/update_special_request/<int:meal_id>/', views.update_special_request, name='update_special_request'),
+    path('update_cart_quantity/<int:meal_id>/', views.update_cart_quantity, name='update_cart_quantity'),
+    path('update_special_request/<int:meal_id>/', views.update_special_request, name='update_special_request'),
     
 
 

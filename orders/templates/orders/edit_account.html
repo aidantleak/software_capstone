@@ -16,6 +16,8 @@
         <input type="text" name="dorm_location" value="{{ user.userprofile.dorm_location }}" placeholder="e.g. Triton Hall 204">
 
         <button type="submit" class="button">Save Changes</button>
+        <a href="{% url 'account' %}" class="button">Back to Account</a>
+
     </form>
 </div>
 {% endblock %}
