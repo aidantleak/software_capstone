@@ -1,4 +1,5 @@
 {% extends 'orders/base.html' %}
+{% load custom_filters %}
 
 {% load static %}
 
@@ -26,18 +27,18 @@
 
 <div class="container">
     <p id="status-message">🎉 Thank you for your order!</p>
-    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+    </div>
+    <a href="{% url 'order_details' order.id %}" style = "text-decoration: underline; color: black;">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+    </a>
     <p><strong>Payment Method:</strong> {{order.payment_method}}</p>
     <p><strong>Delivery Method:</strong> {{order.delivery_method}}</p>
     {% if order.delivery_method == 'dorm' %}
         <p><strong>Dorm Location:</strong> {{ order.dorm_location }}</p>
     {% endif %}
-    <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number }}</p>
-
-
-    <div class="progress-bar">
-        <div class="progress-bar-fill" id="progress-bar-fill"></div>
-    </div>
+    <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number|phone_format }}</p>
 
     <a href="{% url 'menu' %}" class="button">Return to Menu</a>
     <a href="{% url 'account' %}" class="button">View my account</a>

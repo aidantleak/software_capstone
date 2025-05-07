@@ -1,3 +1,8 @@
+<!-- This is the base template for the Triton Pub website. It includes the navigation bar, footer, and basic styles. -->
+
+{% load static %}
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,7 +111,9 @@
         </div>
         <div>
             {% if user.is_authenticated %}
-                <span>Hi, {{ user.username }}</span> |
+                <span> <a href="{% url 'account' %}" style="color: white; font-weight: bold; text-decoration: none;">
+                    Hi, {{ user.username }}
+                </a></span> |
                 <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
                     {% csrf_token %}
                 </form>

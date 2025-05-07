@@ -1,5 +1,7 @@
 {% extends 'orders/base.html' %}
 
+{% load custom_filters %}
+
 {% load static %}
 
 {% block content %}
@@ -12,7 +14,7 @@
         <h2>Welcome, {{ user.username }}</h2>
         <p><strong>Meal Swipes Left:</strong> {{ user.userprofile.meal_swipes }}</p>
         <p><strong>Flex Dollars Left:</strong> ${{ user.userprofile.flex_dollars }}</p>
-        <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number }}</p>
+        <p><strong>Phone Number:</strong> {{ user.userprofile.phone_number|phone_format }}</p>
         <p><strong>Dorm Location:</strong> {{ user.userprofile.dorm_location }}</p>
     </div>
 
